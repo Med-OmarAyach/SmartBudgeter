@@ -50,6 +50,10 @@ interface Conseil {
         <div class="section-header">
           <h2>Prochains Rappels</h2>
           <p class="subtitle">Factures et échéances à ne pas manquer</p>
+          <button class="btn-create" (click)="createRappel()">
+            <i class="icon-plus"></i>
+            Créer un rappel
+          </button>
         </div>
 
         <div class="rappels-grid">
@@ -148,12 +152,14 @@ interface Conseil {
   `,
   styles: [`
     .container {
-      max-width: 1200px;
-      margin: 0 auto;
+      max-width: 100vw;
+      width: 100%;
+      margin: 0;
       padding: 20px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0a0c12;
+      background: #ffffff;
       min-height: 100vh;
+      box-sizing: border-box;
     }
 
     .tabs-container {
@@ -574,9 +580,114 @@ interface Conseil {
         font-size: 28px;
       }
     }
+    .rappels-section {
+    background-color: #121621; /* Main background color */
+    padding: 2rem; /* Add some padding */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    color: #ffffff; /* Text color */
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between; /* Space between header and button */
+    align-items: center; /* Center items vertically */
+    margin-bottom: 1.5rem; /* Space below the header */
+}
+
+h2 {
+    font-size: 1.8rem; /* Adjust size for headings */
+    font-weight: bold; /* Bold text */
+    color: #e0e0e0; /* Slightly lighter text color for contrast */
+}
+
+.subtitle {
+    font-size: 1rem; /* Subtitle size */
+    color: #b0b0b0; /* Lighter color for subtitles */
+}
+
+.btn-create {
+    background-color: #4CAF50; /* Green background for button */
+    color: white; /* Button text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 0.5rem 1rem; /* Padding for button */
+    cursor: pointer; /* Pointer on hover */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.btn-create:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.icon-plus {
+    margin-right: 0.5rem; /* Space between icon and text */
+    font-size: 1.2rem; /* Icon size */
+}
+.conseils-section {
+    background-color: #121621; /* Main background color */
+    padding: 2rem; /* Add padding */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    color: #ffffff; /* Text color */
+}
+
+.section-header {
+    margin-bottom: 1.5rem; /* Space below the header */
+}
+
+h2 {
+    font-size: 1.8rem; /* Adjust size for headings */
+    font-weight: bold; /* Bold text */
+    color: #e0e0e0; /* Slightly lighter text color for contrast */
+}
+
+.subtitle {
+    font-size: 1rem; /* Subtitle size */
+    color: #b0b0b0; /* Lighter color for subtitles */
+}
+
+/* Example styling for any list of tips to enhance user experience */
+.tips-list {
+    margin-top: 1rem; /* Space above the tips list */
+    list-style-type: none; /* Remove bullet points */
+    padding-left: 0; /* Remove default padding */
+}
+
+.tips-list li {
+    background-color: #1a232e; /* Slightly lighter background for list items */
+    border-radius: 5px; /* Rounded corners for list items */
+    padding: 1rem; /* Padding for list items */
+    margin-bottom: 0.5rem; /* Space between list items */
+    transition: transform 0.2s; /* Animation for hover effect */
+}
+
+.tips-list li:hover {
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+/* Button styles, if applicable */
+.btn {
+    background-color: #4CAF50; /* Green background for buttons */
+    color: white; /* Button text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 0.5rem 1rem; /* Padding for button */
+    cursor: pointer; /* Pointer on hover */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.btn:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+
   `]
 })
 export class RappelsConseilsComponent implements OnInit {
+createRappel() {
+throw new Error('Method not implemented.');
+}
   activeTab: 'rappels' | 'conseils' = 'rappels';
   
   rappels: Rappel[] = [
