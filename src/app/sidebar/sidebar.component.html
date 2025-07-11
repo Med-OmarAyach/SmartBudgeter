@@ -1,0 +1,24 @@
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">ET</div>
+        <div class="logo-text">Expense Tracker</div>
+    </div>
+    <nav class="nav-menu">
+        <div class="nav-item" (click)="navigateTo('historique')">
+            <i data-lucide="history"></i>
+            <span>Historique des Dépenses</span>
+        </div>
+        <div class="nav-item" (click)="navigateTo('budget')">
+            <i data-lucide="pie-chart"></i>
+            <span>Budget *&* Alertes</span>
+        </div>
+        <div class="nav-item" (click)="navigateTo('categories')">
+            <i data-lucide="tag"></i>
+            <span>Catégories</span>
+        </div>
+        <div class="nav-item" (click)="navigateTo('settings')">
+            <i data-lucide="settings"></i>
+            <span>Paramètres</span>
+        </div>
+    </nav>
+</aside>
