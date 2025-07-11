@@ -1,0 +1,43 @@
+<mat-drawer-container class="drawer-container">
+  <mat-drawer
+    class="sidebar"
+    mode="side"
+    opened
+    [style.backgroundColor]="'#0a1d37'"
+    [style.color]="'white'"
+  >
+    <div class="header">
+      <a routerLink="/home" class="logo">
+        <img src="assets/logo.png" alt="Logo" />
+      </a>
+      <div class="workspace">
+        <span>Workspace</span>
+        <strong>Devias</strong>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <nav class="nav-items">
+      <ng-container *ngFor="let item of navItems">
+        <a [routerLink]="item.route" class="nav-item" routerLinkActive="active">
+          <span>{{ item.title }}</span>
+        </a>
+      </ng-container>
+    </nav>
+
+    <mat-divider></mat-divider>
+
+    <div class="footer">
+      <h4>Need more features?</h4>
+      <p>Check out our Pro solution template.</p>
+      <button mat-raised-button color="primary" class="pro-button" (click)="goToProSolution()">
+        Pro version
+      </button>
+    </div>
+  </mat-drawer>
+  
+  <mat-drawer-content>
+    <router-outlet></router-outlet>
+  </mat-drawer-content>
+</mat-drawer-container>
