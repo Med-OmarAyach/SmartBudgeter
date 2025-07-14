@@ -1,1 +1,124 @@
-<p>rappels-conseils works!</p>
+<div class="container">
+      <!-- Navigation Tabs -->
+      <div class="tabs-container">
+        <button 
+          class="tab-button"
+          [class.active]="activeTab === 'rappels'"
+          (click)="activeTab = 'rappels'">
+          <i class="icon-bell"></i>
+          Rappels
+        </button>
+        <button 
+          class="tab-button"
+          [class.active]="activeTab === 'conseils'"
+          (click)="activeTab = 'conseils'">
+          <i class="icon-lightbulb"></i>
+          Conseils
+        </button>
+      </div>
+
+      <!-- Rappels Section -->
+      <div *ngIf="activeTab === 'rappels'" class="rappels-section">
+        <div class="section-header">
+          <h2>Prochains Rappels</h2>
+          <p class="subtitle">Factures et échéances à ne pas manquer</p>
+          <button class="btn-create" (click)="createRappel()">
+            <i class="icon-plus"></i>
+            Créer un rappel
+          </button>
+        </div>
+
+        <div class="rappels-grid">
+          <div 
+            *ngFor="let rappel of rappels" 
+            class="rappel-card"
+            [class.urgent]="rappel.statut === 'urgent'"
+            [class.bientot]="rappel.statut === 'bientot'">
+            
+            <div class="card-header">
+              <div class="type-badge" [class]="rappel.type">
+                {{ getTypeLabel(rappel.type) }}
+              </div>
+              <div class="statut-indicator" [class]="rappel.statut">
+                <i class="icon-clock"></i>
+                {{ getStatutLabel(rappel.statut) }}
+              </div>
+            </div>
+
+            <div class="card-body">
+              <h3>{{ rappel.titre }}</h3>
+              <p class="montant">{{ rappel.montant | currency:'EUR':'symbol':'1.2-2':'fr' }}</p>
+              <p class="date-echeance">
+                <i class="icon-calendar"></i>
+                Échéance: {{ rappel.dateEcheance | date:'dd/MM/yyyy' }}
+              </p>
+              <p *ngIf="rappel.description" class="description">
+                {{ rappel.description }}
+              </p>
+            </div>
+
+            <div class="card-actions">
+              <button class="btn-primary" (click)="marquerPaye(rappel.id)">
+                <i class="icon-check"></i>
+                Marquer comme payé
+              </button>
+              <button class="btn-secondary" (click)="reporterRappel(rappel.id)">
+                <i class="icon-clock"></i>
+                Reporter
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="rappels.length === 0" class="empty-state">
+          <i class="icon-check-circle"></i>
+          <h3>Aucun rappel en cours</h3>
+          <p>Toutes vos factures sont à jour !</p>
+        </div>
+      </div>
+
+      <!-- Conseils Section -->
+      <div *ngIf="activeTab === 'conseils'" class="conseils-section">
+        <div class="section-header">
+          <h2>Conseils & Astuces</h2>
+          <p class="subtitle">Optimisez votre gestion financière</p>
+        </div>
+
+        <!-- Astuce du jour -->
+        <div class="astuce-jour">
+          <div class="astuce-header">
+            <i class="icon-star"></i>
+            <h3>Astuce du jour</h3>
+          </div>
+          <div class="astuce-content">
+            <h4>{{ astuceDuJour.titre }}</h4>
+            <p>{{ astuceDuJour.contenu }}</p>
+          </div>
+        </div>
+
+        <!-- Autres conseils -->
+        <div class="conseils-grid">
+          <div 
+            *ngFor="let conseil of conseils" 
+            class="conseil-card"
+            [class]="conseil.categorie">
+            
+            <div class="card-icon">
+              <i [class]="conseil.icone"></i>
+            </div>
+            
+            <div class="card-content">
+              <div class="categorie-badge">
+                {{ getCategorieLabel(conseil.categorie) }}
+              </div>
+              <h4>{{ conseil.titre }}</h4>
+              <p>{{ conseil.contenu }}</p>
+              <small class="date-publication">
+                {{ conseil.datePublication | date:'dd/MM/yyyy' }}
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `*

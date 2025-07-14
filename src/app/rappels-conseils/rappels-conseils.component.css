@@ -1,0 +1,548 @@
+.container {
+      max-width: 100vw;
+      width: 100%;
+      margin: 0;
+      padding: 0px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #ffffff;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .tabs-container {
+      display: flex;
+      gap: 0;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #1f2533;
+      background: #121621;
+      border-radius: 10px 10px 10px 10px  ;
+    }
+
+    .tab-button {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 32px;
+      background: transparent;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      color: #6b7280;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+      position: relative;
+      letter-spacing: 0.02em;
+      border-radius: 10px;
+    }
+
+    .tab-button:hover {
+      color: #9ca3af;
+      background: rgba(18, 22, 33, 0.8);
+    }
+
+    .tab-button.active {
+      color: #ffffff;
+      border-bottom-color: #121621;
+      background: #121621;
+    }
+
+    .tab-button.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #121621, #1f2533);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .section-header h2 {
+      font-size: 32px;
+      color: #ffffff;
+      margin-bottom: 12px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      color: #9ca3af;
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    /* Rappels Styles */
+    .rappels-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .rappel-card {
+      background: #121621;
+      border: 1px solid #1f2533;
+      padding: 24px;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rappel-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #121621;
+    }
+
+    .rappel-card:hover {
+      border-color: #2d3748;
+      transform: translateY(-1px);
+    }
+
+    .rappel-card.urgent::before {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+
+    .rappel-card.bientot::before {
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+
+    .rappel-card.normal::before {
+      background: linear-gradient(90deg, #10b981, #059669);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .type-badge {
+      padding: 6px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: 1px solid #1f2533;
+    }
+
+    .type-badge.facture { 
+      background: rgba(18, 22, 33, 0.8);
+      color: #60a5fa;
+      border-color: #1e40af;
+    }
+    .type-badge.impot { 
+      background: rgba(18, 22, 33, 0.8);
+      color: #f472b6;
+      border-color: #be185d;
+    }
+    .type-badge.abonnement { 
+      background: rgba(18, 22, 33, 0.8);
+      color: #34d399;
+      border-color: #059669;
+    }
+    .type-badge.autre { 
+      background: rgba(18, 22, 33, 0.8);
+      color: #a78bfa;
+      border-color: #7c3aed;
+    }
+
+    .statut-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .statut-indicator.urgent { color: #ef4444; }
+    .statut-indicator.bientot { color: #f59e0b; }
+    .statut-indicator.normal { color: #10b981; }
+
+    .card-body h3 {
+      font-size: 20px;
+      color: #ffffff;
+      margin-bottom: 12px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .montant {
+      font-size: 28px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .date-echeance {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #9ca3af;
+      font-size: 14px;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .description {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn-primary, .btn-secondary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-primary {
+      background: #121621;
+      color: #ffffff;
+      border: 1px solid #1f2533;
+    }
+
+    .btn-primary:hover {
+      background: #1f2533;
+      border-color: #2d3748;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #9ca3af;
+      border: 1px solid #1f2533;
+    }
+
+    .btn-secondary:hover {
+      background: #121621;
+      color: #ffffff;
+      border-color: #2d3748;
+    }
+
+    /* Conseils Styles */
+    .astuce-jour {
+      background: linear-gradient(135deg, #121621 0%, #1f2533 100%);
+      color: #ffffff;
+      padding: 32px;
+      margin-bottom: 48px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #1f2533;
+    }
+
+    .astuce-jour::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    }
+
+    .astuce-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .astuce-header i {
+      font-size: 28px;
+      color: #fbbf24;
+    }
+
+    .astuce-header h3 {
+      font-size: 22px;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .astuce-content h4 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .astuce-content p {
+      line-height: 1.6;
+      color: #d1d5db;
+      font-size: 16px;
+    }
+
+    .conseils-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .conseil-card {
+      background: #121621;
+      border: 1px solid #1f2533;
+      padding: 24px;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .conseil-card:hover {
+      border-color: #2d3748;
+      transform: translateY(-1px);
+    }
+
+    .conseil-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .conseil-card.economie::before { background: linear-gradient(90deg, #10b981, #059669); }
+    .conseil-card.investissement::before { background: linear-gradient(90deg, #8b5cf6, #7c3aed); }
+    .conseil-card.budget::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
+    .conseil-card.astuce::before { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+
+    .card-icon {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .card-icon i {
+      font-size: 32px;
+      color: #9ca3af;
+    }
+
+    .categorie-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      background: rgba(18, 22, 33, 0.8);
+      border: 1px solid #1f2533;
+      font-size: 11px;
+      font-weight: 600;
+      color: #9ca3af;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .conseil-card h4 {
+      font-size: 18px;
+      color: #ffffff;
+      margin-bottom: 12px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .conseil-card p {
+      color: #9ca3af;
+      line-height: 1.6;
+      margin-bottom: 16px;
+      font-size: 15px;
+    }
+
+    .date-publication {
+      color: #6b7280;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: #6b7280;
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      color: #10b981;
+      margin-bottom: 24px;
+    }
+
+    .empty-state h3 {
+      font-size: 24px;
+      margin-bottom: 12px;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Icons */
+    .icon-bell:before { content: '🔔'; }
+    .icon-lightbulb:before { content: '💡'; }
+    .icon-clock:before { content: '⏰'; }
+    .icon-calendar:before { content: '📅'; }
+    .icon-check:before { content: '✓'; }
+    .icon-check-circle:before { content: '✅'; }
+    .icon-star:before { content: '⭐'; }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 16px;
+      }
+      
+      .rappels-grid, .conseils-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .card-actions {
+        flex-direction: column;
+      }
+      
+      .tab-button {
+        padding: 16px 24px;
+      }
+      
+      .section-header h2 {
+        font-size: 28px;
+      }
+    }
+    .rappels-section {
+    background-color: #121621; /* Main background color */
+    padding: 2rem; /* Add some padding */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    color: #ffffff; /* Text color */
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between; /* Space between header and button */
+    align-items: center; /* Center items vertically */
+    margin-bottom: 1.5rem; /* Space below the header */
+}
+
+h2 {
+    font-size: 1.8rem; /* Adjust size for headings */
+    font-weight: bold; /* Bold text */
+    color: #e0e0e0; /* Slightly lighter text color for contrast */
+}
+
+.subtitle {
+    font-size: 1rem; /* Subtitle size */
+    color: #b0b0b0; /* Lighter color for subtitles */
+}
+
+.btn-create {
+    background-color: #4CAF50; /* Green background for button */
+    color: white; /* Button text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 0.5rem 1rem; /* Padding for button */
+    cursor: pointer; /* Pointer on hover */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.btn-create:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+.icon-plus {
+    margin-right: 0.5rem; /* Space between icon and text */
+    font-size: 1.2rem; /* Icon size */
+}
+.conseils-section {
+    background-color: #121621; /* Main background color */
+    padding: 2rem; /* Add padding */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    color: #ffffff; /* Text color */
+}
+
+.section-header {
+    margin-bottom: 1.5rem; /* Space below the header */
+}
+
+h2 {
+    font-size: 1.8rem; /* Adjust size for headings */
+    font-weight: bold; /* Bold text */
+    color: #e0e0e0; /* Slightly lighter text color for contrast */
+}
+
+.subtitle {
+    font-size: 1rem; /* Subtitle size */
+    color: #b0b0b0; /* Lighter color for subtitles */
+}
+
+/* Example styling for any list of tips to enhance user experience */
+.tips-list {
+    margin-top: 1rem; /* Space above the tips list */
+    list-style-type: none; /* Remove bullet points */
+    padding-left: 0; /* Remove default padding */
+}
+
+.tips-list li {
+    background-color: #1a232e; /* Slightly lighter background for list items */
+    border-radius: 5px; /* Rounded corners for list items */
+    padding: 1rem; /* Padding for list items */
+    margin-bottom: 0.5rem; /* Space between list items */
+    transition: transform 0.2s; /* Animation for hover effect */
+}
+
+.tips-list li:hover {
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+/* Button styles, if applicable */
+.btn {
+    background-color: #4CAF50; /* Green background for buttons */
+    color: white; /* Button text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 0.5rem 1rem; /* Padding for button */
+    cursor: pointer; /* Pointer on hover */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.btn:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+ @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+
+  

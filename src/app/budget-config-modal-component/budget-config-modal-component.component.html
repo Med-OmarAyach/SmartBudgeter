@@ -1,0 +1,125 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>Configuration du Budget</h2>
+          <button class="close-btn" (click)="closeModal()">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        
+        <form (ngSubmit)="onSubmit()" #budgetForm="ngForm">
+          <div class="form-section">
+            <h3>Limites Mensuelles par Catégorie</h3>
+            
+            <div class="budget-items" *ngFor="let config of budgetConfigs; trackBy: trackByCategory">
+              <div class="form-group">
+                <label>{{ getCategoryName(config.category_id) }}</label>
+                <div class="input-group">
+                  <input 
+                    type="number" 
+                    [(ngModel)]="config.monthly_limit"
+                    [name]="'limit_' + config.category_id"
+                    class="form-control"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    required>
+                  <span class="input-suffix">€</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="add-category-section">
+              <h4>Ajouter une nouvelle catégorie</h4>
+              <div class="form-group">
+                <select 
+                  [(ngModel)]="selectedCategoryId" 
+                  name="newCategory"
+                  class="form-control">
+                  <option value="">Sélectionner une catégorie</option>
+                  <option 
+                    *ngFor="let category of availableCategories" 
+                    [value]="category.id">
+                    {{ category.name }}
+                  </option>
+                </select>
+              </div>
+              
+              <div class="form-group" *ngIf="selectedCategoryId">
+                <label>Limite mensuelle</label>
+                <div class="input-group">
+                  <input 
+                    type="number" 
+                    [(ngModel)]="newBudgetLimit"
+                    name="newBudgetLimit"
+                    class="form-control"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00">
+                  <span class="input-suffix">€</span>
+                </div>
+              </div>
+              
+              <button 
+                type="button" 
+                class="btn btn-secondary"
+                (click)="addBudgetCategory()"
+                [disabled]="!selectedCategoryId || !newBudgetLimit">
+                <i data-lucide="plus"></i>
+                Ajouter
+              </button>
+            </div>
+          </div>
+          
+          <div class="alert-section">
+            <h3>Paramètres d'Alerte</h3>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="alertSettings.emailNotifications"
+                  name="emailNotifications">
+                <span class="checkmark"></span>
+                Notifications par email
+              </label>
+            </div>
+            
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="alertSettings.pushNotifications"
+                  name="pushNotifications">
+                <span class="checkmark"></span>
+                Notifications push
+              </label>
+            </div>
+            
+            <div class="form-group">
+              <label>Seuil d'alerte (%)</label>
+              <div class="input-group">
+                <input 
+                  type="range" 
+                  [(ngModel)]="alertSettings.warningThreshold"
+                  name="warningThreshold"
+                  class="range-slider"
+                  min="50"
+                  max="100"
+                  step="5">
+                <span class="range-value">{{ alertSettings.warningThreshold }}%</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" (click)="closeModal()">
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i data-lucide="save"></i>
+              Enregistrer
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
