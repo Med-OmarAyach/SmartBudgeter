@@ -1,0 +1,121 @@
+
+<div class="sign-in-form">
+  <h2>Welcome Back</h2>
+  <p>
+    Don't have an account?
+    <a routerLink="/auth/sign-up">Create account</a>
+  </p>
+  
+  <form [formGroup]="signInForm" (ngSubmit)="onSubmit()">
+    <!-- Email Field -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email Address</mat-label>
+      <input matInput type="email" formControlName="email" autocomplete="email" />
+      <mat-icon matSuffix class="validation-icon valid" 
+               *ngIf="signInForm.get('email')?.valid && signInForm.get('email')?.touched">
+        check_circle
+      </mat-icon>
+      <mat-icon matSuffix class="validation-icon invalid" 
+               *ngIf="signInForm.get('email')?.invalid && signInForm.get('email')?.touched">
+        error
+      </mat-icon>
+      <mat-error *ngIf="signInForm.get('email')?.hasError('required')">
+        Email is required
+      </mat-error>
+      <mat-error *ngIf="signInForm.get('email')?.hasError('email')">
+        Please enter a valid email address
+      </mat-error>
+    </mat-form-field>
+
+   <mat-form-field appearance="outline" class="full-width modern-password-field">
+  <mat-label>Password</mat-label>
+  <input
+    matInput
+    [type]="showPassword ? 'text' : 'password'"
+    formControlName="password"
+    autocomplete="current-password"
+  />
+  <button
+    mat-icon-button
+    matSuffix
+    type="button"
+    (click)="togglePasswordVisibility()"
+    aria-label="Toggle password visibility"
+  >
+    <mat-icon>{{ showPassword ? 'visibility' : 'visibility_off' }}</mat-icon>
+  </button>
+  <mat-error *ngIf="signInForm.get('password')?.hasError('required')">
+    Password is required
+  </mat-error>
+  <mat-error *ngIf="signInForm.get('password')?.hasError('minlength')">
+    Password must be at least 6 characters
+  </mat-error>
+</mat-form-field>
+
+
+    <!-- Remember Me and Forgot Password Row -->
+    <div class="form-options">
+      <mat-checkbox formControlName="rememberMe" color="primary">
+        Remember me
+      </mat-checkbox>
+      <div class="forgot-link">
+        <a routerLink="/auth/reset-password">Forgot password?</a>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">
+      <mat-icon>error</mat-icon>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-message" *ngIf="successMessage">
+      <mat-icon>check_circle</mat-icon>
+      {{ successMessage }}
+    </div>
+
+
+    <!-- Submit Button -->
+    <button 
+      mat-raised-button 
+      color="primary" 
+      type="submit" 
+      [disabled]="isPending || signInForm.invalid"
+      [class.loading]="isPending">
+      <span >Sign In</span>
+      <span *ngIf="isPending">...</span>
+    </button>
+  </form>
+
+  <!-- Divider -->
+  <div class="divider">
+    <span>Or continue with</span>
+  </div>
+
+  <!-- Social Sign In Options -->
+  <div class="social-buttons">
+    <button mat-raised-button color="primary" class="google-button" (click)="signInWithGoogle()">
+      <mat-icon>google</mat-icon>
+      Sign in with Google
+    </button>
+
+  </div>
+
+
+  <!-- Security Notice -->
+  <div class="security-notice">
+    <p>Your data is protected with enterprise-grade security</p>
+  </div>
+
+  <!-- Additional Links -->
+  <div class="form-footer">
+    <div class="footer-links">
+      <a routerLink="/help">Help Center</a>
+      <span class="divider-dot">•</span>
+      <a routerLink="/privacy">Privacy</a>
+      <span class="divider-dot">•</span>
+      <a routerLink="/terms">Terms</a>
+    </div>
+  </div>
+</div>

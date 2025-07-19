@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { ExpensetableComponent } from './expense-table/expense-table.component';
 import { BudgetComponent } from './budget/budget.component';
 import { RappelsConseilsComponent } from './rappels-conseils/rappels-conseils.component';
-import { SignInFormComponent } from './sign-in-form/sign-in-form.component';
+import { LoginComponent } from './login/login.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/historique', pathMatch: 'full' },
@@ -10,5 +10,5 @@ export const routes: Routes = [
   { path: 'budget', component: BudgetComponent },
   { path: 'rappels-et-conseils', component: RappelsConseilsComponent }, // Placeholder
   { path: 'settings', component: ExpensetableComponent }, // Placeholder
-  { path: 'sign-in', component: SignInFormComponent },
-];
+{path: 'login', component: LoginComponent}
+]
