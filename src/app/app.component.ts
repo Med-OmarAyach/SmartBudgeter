@@ -1,20 +1,16 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { SidebarComponent } from './sidebar/sidebar.component';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, SidebarComponent, CommonModule],
+  imports: [RouterOutlet, CommonModule],
   template: `
-    <div class="app-container">
       <div class="mobile-overlay" [ngClass]="{'active': isSidebarOpen}" (click)="closeMobileSidebar()"></div>
-      <app-sidebar (toggleSidebar)="onToggleSidebar($event)"></app-sidebar>
       <main class="main-content">
         <router-outlet></router-outlet>
       </main>
-    </div>
   `,
   styles: [
     `
