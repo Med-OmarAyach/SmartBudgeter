@@ -5,7 +5,7 @@ import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
-declare const gapi: any;
+declare const google: any;
 
 @Component({
   selector: 'app-login',
@@ -350,6 +350,7 @@ export class LoginComponent implements OnDestroy {
   private googleSignInSubject = new Subject<void>();
   private destroy$ = new Subject<void>();
 
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -366,12 +367,8 @@ export class LoginComponent implements OnDestroy {
     });
 
     // Debounce Google Sign-In clicks to prevent multiple popups
-    this.googleSignInSubject
-      .pipe(debounceTime(1000), takeUntil(this.destroy$))
-      .subscribe(() => this.signInWithGoogle());
-
-    this.initGoogleSignIn();
-  }
+    
+      }
 
   ngOnDestroy() {
     this.destroy$.next();
@@ -423,79 +420,9 @@ export class LoginComponent implements OnDestroy {
   }
 
   private signInWithGoogle() {
-    this.isLoading = true;
-    this.errorMessage = null;
-
-    const auth2 = gapi.auth2.getAuthInstance();
-    if (!auth2) {
-      this.isLoading = false;
-      this.errorMessage = 'Google Sign-In failed: Authentication service not initialized';
-      console.error('Google Auth2 not initialized');
-      return;
-    }
-
-    auth2.signIn({ prompt: 'select_account' }).then((googleUser: any) => {
-      const idToken = googleUser.getAuthResponse()?.id_token;
-      if (!idToken) {
-        this.isLoading = false;
-        this.errorMessage = 'Google Sign-In failed: No ID token received';
-        console.error('No ID token received from Google');
-        return;
-      }
-
-      this.authService.googleSignIn(idToken).subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          localStorage.setItem('accessToken', response.accessToken);
-          localStorage.setItem('refreshToken', response.refreshToken);
-          this.router.navigate(['/dashboard']);
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.errorMessage = error.error?.message || 'Google Sign-In failed. Please try again.';
-          console.error('Google Sign-In server error:', error);
-        }
-      });
-    }).catch((error: any) => {
-      this.isLoading = false;
-      let errorMsg = 'Google Sign-In failed. Please try again.';
-      if (error.error === 'popup_closed_by_user') {
-        errorMsg = 'Google Sign-In cancelled by user';
-      } else if (error.error === 'access_denied') {
-        errorMsg = 'Google Sign-In failed: Access denied';
-      } else if (error.error === 'immediate_failed') {
-        errorMsg = 'Google Sign-In failed: Immediate login failed';
-      } else if (error.error === 'popup_blocked_by_browser') {
-        errorMsg = 'Google Sign-In blocked by browser. Please allow popups for this site.';
-      } else {
-        console.error('Google Sign-In error:', error);
-      }
-      this.errorMessage = errorMsg;
-    });
+    
   }
 
-  private initGoogleSignIn() {
-    gapi.load('auth2', () => {
-      try {
-        gapi.auth2.init({
-          client_id: '803637816834-c34gnvoou8i92o9u3lj5936cb6j4f54u.apps.googleusercontent.com',
-          scope: 'profile email'
-        }).then(() => {
-          console.log('Google Auth2 initialized successfully');
-          // Disable auto sign-in to prevent unintended popup behavior
-          gapi.auth2.getAuthInstance().isSignedIn.listen((isSignedIn: boolean) => {
-            if (isSignedIn) {
-              gapi.auth2.getAuthInstance().signOut(); // Sign out to force account selection
-            }
-          });
-        }).catch((error: any) => {
-          this.errorMessage = 'Failed to initialize Google Sign-In';
-          console.error('Google Auth2 initialization error:', error);
-        });
-      } catch (error) {
-        this.errorMessage = 'Failed to load Google Sign-In library';
-        console.error('Google Auth2 load error:', error);
-      }
-    });
-  }
+  
+  
 }
