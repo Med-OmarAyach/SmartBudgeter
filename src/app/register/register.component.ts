@@ -134,7 +134,8 @@ import { GoogleSigninService } from '../services/google-signin.service';
 
     
 <!-- In your component HTML -->
-<div id="google-button"></div>
+ <div class="gclass"><div id="google-button"></div></div>
+
 
         <div class="login-link">
           Already have an account? <a href="/login" class="link">Sign in</a>
@@ -327,7 +328,10 @@ import { GoogleSigninService } from '../services/google-signin.service';
       justify-content: center;
       gap: 8px;
     }
-
+.gclass{
+  display: flex;
+justify-content: center
+}
     .spinner {
       width: 16px;
       height: 16px;
