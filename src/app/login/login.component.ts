@@ -1,7 +1,11 @@
-// login.component.ts
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
+declare const gapi: any;
 
 @Component({
   selector: 'app-login',
@@ -14,20 +18,23 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
           <h2>Welcome Back</h2>
           <p>Please sign in to your account</p>
         </div>
+
+        <div *ngIf="errorMessage" class="server-error-message">
+          {{ errorMessage }}
+        </div>
         
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
           <div class="form-group">
-            <label for="email">Email</label>
+            <label for="username">Username</label>
             <input
-              type="email"
-              id="email"
-              formControlName="email"
-              placeholder="Enter your email"
-              [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+              type="text"
+              id="username"
+              formControlName="username"
+              placeholder="Enter your username"
+              [class.error]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
             />
-            <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
-              <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</span>
-              <span *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+            <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" class="error-message">
+              <span *ngIf="loginForm.get('username')?.errors?.['required']">Username is required</span>
             </div>
           </div>
 
@@ -72,7 +79,11 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
           <span>or</span>
         </div>
 
-        <button class="google-button" (click)="signInWithGoogle()">
+        <button 
+          class="google-button" 
+          (click)="triggerGoogleSignIn()" 
+          [disabled]="isLoading"
+        >
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -89,8 +100,6 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
     </div>
   `,
   styles: [`
-  .{      background: #121621;
-}
     .login-container {
       position: absolute;
       top: 0;
@@ -181,6 +190,17 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
       margin-top: 4px;
     }
 
+    .server-error-message {
+      background: rgba(255, 107, 107, 0.1);
+      border: 1px solid #ff6b6b;
+      border-radius: 8px;
+      padding: 12px;
+      color: #ff6b6b;
+      font-size: 14px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
     .form-options {
       display: flex;
       justify-content: space-between;
@@ -212,7 +232,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
       opacity: 0.8;
     }
 
-    .login-button {
+    .login-button, .google-button {
       width: 100%;
       padding: 12px;
       background: white;
@@ -226,12 +246,27 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
       margin-bottom: 24px;
     }
 
-    .login-button:hover:not(:disabled) {
+    .google-button {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .login-button:hover:not(:disabled), .google-button:hover:not(:disabled) {
       background: rgba(255, 255, 255, 0.9);
       transform: translateY(-1px);
     }
 
-    .login-button:disabled {
+    .google-button:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .login-button:disabled, .google-button:disabled {
       opacity: 0.7;
       cursor: not-allowed;
     }
@@ -281,29 +316,6 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
       position: relative;
     }
 
-    .google-button {
-      width: 100%;
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      color: white;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      transition: all 0.3s ease;
-      margin-bottom: 24px;
-    }
-
-    .google-button:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateY(-1px);
-    }
-
     .signup-link {
       text-align: center;
       color: rgba(255, 255, 255, 0.7);
@@ -331,38 +343,159 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
     }
   `]
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
   loginForm: FormGroup;
   isLoading = false;
+  errorMessage: string | null = null;
+  private googleSignInSubject = new Subject<void>();
+  private destroy$ = new Subject<void>();
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      username: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(6)]],
       rememberMe: [false]
     });
+
+    this.loginForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.errorMessage = null; // Clear error message when user starts typing
+    });
+
+    // Debounce Google Sign-In clicks to prevent multiple popups
+    this.googleSignInSubject
+      .pipe(debounceTime(1000), takeUntil(this.destroy$))
+      .subscribe(() => this.signInWithGoogle());
+
+    this.initGoogleSignIn();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onSubmit() {
     if (this.loginForm.valid) {
       this.isLoading = true;
-      
-      // Simulate API call
-      setTimeout(() => {
-        console.log('Login attempt:', this.loginForm.value);
-        this.isLoading = false;
-        // Handle successful login here
-      }, 2000);
+      this.errorMessage = null;
+
+      const loginData = {
+        username: this.loginForm.get('username')?.value,
+        password: this.loginForm.get('password')?.value
+      };
+
+      this.authService.signIn(loginData).subscribe({
+        next: (response) => {
+          localStorage.setItem('accessToken', response.accessToken);
+          if (this.loginForm.get('rememberMe')?.value) {
+            localStorage.setItem('refreshToken', response.refreshToken);
+          } else {
+            sessionStorage.setItem('refreshToken', response.refreshToken);
+          }
+          this.isLoading = false;
+          this.router.navigate(['/budget']);
+        },
+        error: (error) => {
+          this.isLoading = false;
+          if (error.status === 401) {
+            this.errorMessage = 'Invalid username or password';
+          } else if (error.status === 500) {
+            this.errorMessage = 'Server error. Please try again later.';
+          } else {
+            this.errorMessage = error.error?.message || 'Login failed. Please try again.';
+          }
+          console.error('Login error:', error);
+        }
+      });
     } else {
-      // Mark all fields as touched to show validation errors
       Object.keys(this.loginForm.controls).forEach(key => {
         this.loginForm.get(key)?.markAsTouched();
       });
     }
   }
 
-  signInWithGoogle() {
-    console.log('Google sign-in clicked');
-    // Implement Google OAuth here
+  triggerGoogleSignIn() {
+    this.googleSignInSubject.next(); // Trigger debounced sign-in
+  }
+
+  private signInWithGoogle() {
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    const auth2 = gapi.auth2.getAuthInstance();
+    if (!auth2) {
+      this.isLoading = false;
+      this.errorMessage = 'Google Sign-In failed: Authentication service not initialized';
+      console.error('Google Auth2 not initialized');
+      return;
+    }
+
+    auth2.signIn({ prompt: 'select_account' }).then((googleUser: any) => {
+      const idToken = googleUser.getAuthResponse()?.id_token;
+      if (!idToken) {
+        this.isLoading = false;
+        this.errorMessage = 'Google Sign-In failed: No ID token received';
+        console.error('No ID token received from Google');
+        return;
+      }
+
+      this.authService.googleSignIn(idToken).subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          localStorage.setItem('accessToken', response.accessToken);
+          localStorage.setItem('refreshToken', response.refreshToken);
+          this.router.navigate(['/dashboard']);
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.errorMessage = error.error?.message || 'Google Sign-In failed. Please try again.';
+          console.error('Google Sign-In server error:', error);
+        }
+      });
+    }).catch((error: any) => {
+      this.isLoading = false;
+      let errorMsg = 'Google Sign-In failed. Please try again.';
+      if (error.error === 'popup_closed_by_user') {
+        errorMsg = 'Google Sign-In cancelled by user';
+      } else if (error.error === 'access_denied') {
+        errorMsg = 'Google Sign-In failed: Access denied';
+      } else if (error.error === 'immediate_failed') {
+        errorMsg = 'Google Sign-In failed: Immediate login failed';
+      } else if (error.error === 'popup_blocked_by_browser') {
+        errorMsg = 'Google Sign-In blocked by browser. Please allow popups for this site.';
+      } else {
+        console.error('Google Sign-In error:', error);
+      }
+      this.errorMessage = errorMsg;
+    });
+  }
+
+  private initGoogleSignIn() {
+    gapi.load('auth2', () => {
+      try {
+        gapi.auth2.init({
+          client_id: '803637816834-c34gnvoou8i92o9u3lj5936cb6j4f54u.apps.googleusercontent.com',
+          scope: 'profile email'
+        }).then(() => {
+          console.log('Google Auth2 initialized successfully');
+          // Disable auto sign-in to prevent unintended popup behavior
+          gapi.auth2.getAuthInstance().isSignedIn.listen((isSignedIn: boolean) => {
+            if (isSignedIn) {
+              gapi.auth2.getAuthInstance().signOut(); // Sign out to force account selection
+            }
+          });
+        }).catch((error: any) => {
+          this.errorMessage = 'Failed to initialize Google Sign-In';
+          console.error('Google Auth2 initialization error:', error);
+        });
+      } catch (error) {
+        this.errorMessage = 'Failed to load Google Sign-In library';
+        console.error('Google Auth2 load error:', error);
+      }
+    });
   }
 }
