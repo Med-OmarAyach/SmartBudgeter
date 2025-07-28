@@ -17,6 +17,14 @@ import {MatRippleModule} from '@angular/material/core';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatSelectModule} from '@angular/material/select';
+import { MatCardModule } from "@angular/material/card";
+import { MatIconModule } from "@angular/material/icon";
+import { MatProgressBarModule } from "@angular/material/progress-bar";
+import { MatGridListModule } from '@angular/material/grid-list';
+import { NgChartsModule } from 'ng2-charts';
+import { LatestOrdersComponent } from '../../components/budget-table/latest-orders.component';
+import { MatDividerModule } from "@angular/material/divider";
+import { MatTableModule } from "@angular/material/table";
 
 @NgModule({
   imports: [
@@ -30,7 +38,14 @@ import {MatSelectModule} from '@angular/material/select';
     MatInputModule,
     MatSelectModule,
     MatTooltipModule,
-  ],
+    MatCardModule,
+    MatIconModule,
+    MatProgressBarModule,
+    MatGridListModule,
+    NgChartsModule,
+    MatDividerModule,
+    MatTableModule
+],
   declarations: [
     DashboardComponent,
     UserProfileComponent,
@@ -40,6 +55,7 @@ import {MatSelectModule} from '@angular/material/select';
     MapsComponent,
     NotificationsComponent,
     UpgradeComponent,
+    LatestOrdersComponent,
   ]
 })
 

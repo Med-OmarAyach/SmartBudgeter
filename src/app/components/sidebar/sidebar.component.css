@@ -1,0 +1,18 @@
+::ng-deep .sidebar .nav li.active > a {
+  background-color: #3c1179;  
+  color: white !important;
+  border-radius: 4px;
+}
+::ng-deep .sidebar .nav li.active > a:hover {
+  background-color: #1976D2; 
+}
+
+
+::ng-deep .sidebar .sidebar-wrapper {
+  background-color: #1e1e2f !important;
+    color: white !important;
+    height: 100%;
+}
+::ng-deep .sidebar .sidebar-wrapper p {
+  color: white !important;
+}
