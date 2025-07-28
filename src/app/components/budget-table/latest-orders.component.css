@@ -1,0 +1,99 @@
+:host {
+  display: block;
+}
+
+.table-container {
+  overflow-x: auto;
+  max-height: 390px;
+  padding: 16px;
+}
+
+mat-card {
+  margin-bottom: 24px;
+}
+
+mat-card-header {
+  padding-bottom: 0;
+}
+
+mat-card-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+mat-divider {
+  margin: 0 16px;
+}
+
+mat-card-actions {
+  padding: 8px 16px;
+  justify-content: flex-end;
+}
+
+table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+}
+
+.mat-header-cell {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.mat-cell {
+  font-size: 0.9rem;
+}
+
+.mat-row:hover {
+  background-color: #f9f9f9;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.budget-bar {
+  height: 12px;
+  border-radius: 6px;
+}
+
+.caption {
+  text-align: right;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: gray;
+}
+.progress-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 120px;
+}
+
+.progress-label {
+  font-size: 12px;
+  color: #555;
+  text-align: center;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+}
+
+/* Color backgrounds */
+.primary {
+  background-color: #4caf50; /* green */
+}
+
+.accent {
+  background-color: #2196f3; /* blue */
+}
+
+.warn {
+  background-color: #f44336; /* red */
+}
