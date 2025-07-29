@@ -1,38 +1,201 @@
-<div class="page-content fade-in-up">
-      <div class="page-header">
-        <h1 class="page-title">Budget & Alertes</h1>
-        <button class="btn btn-primary" (click)="openConfigModal()">
-          <i data-lucide="settings"></i>
-          Configurer
+<div class="budget-container">
+  <!-- Header Section -->
+  <div class="budget-header">
+    <div class="header-content">
+      <h1>Gestion des Budgets</h1>
+      <p class="header-subtitle">Suivez et gérez vos budgets mensuels par catégorie</p>
+    </div>
+    <div class="header-actions">
+      <button 
+        class="btn btn-primary" 
+        (click)="openConfigModal()"
+        [disabled]="loading">
+        <i data-lucide="settings"></i>
+        Configurer les Budgets
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement des données...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-content">
+      <i data-lucide="alert-circle"></i>
+      <h3>Erreur</h3>
+      <p>{{ error }}</p>
+      <div class="error-actions">
+        <button class="btn btn-primary" (click)="retry()">
+          <i data-lucide="refresh-cw"></i>
+          Réessayer
+        </button>
+        <button class="btn btn-outline" (click)="clearError()">
+          Ignorer
         </button>
       </div>
+    </div>
+  </div>
 
-      <div class="budget-grid">
-        <div class="budget-card" *ngFor="let budget of budgets">
-          <div class="budget-header">
-            <div class="category-name">{{ budget.category }}</div>
-            <div class="budget-amount">{{ budget.budget | number:'1.2-2' }} €</div>
+  <!-- Budget Summary -->
+  <div *ngIf="budgetSummary && !loading" class="budget-summary">
+    <div class="summary-card">
+      <div class="summary-item">
+        <div class="summary-icon total">
+          <i data-lucide="wallet"></i>
+        </div>
+        <div class="summary-content">
+          <h3>{{ budgetSummary.totalMonthlyLimit | currency:'EUR':'symbol':'1.2-2' }}</h3>
+          <p>Budget Total</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-item">
+        <div class="summary-icon spent">
+          <i data-lucide="trending-up"></i>
+        </div>
+        <div class="summary-content">
+          <h3>{{ budgetSummary.totalSpent | currency:'EUR':'symbol':'1.2-2' }}</h3>
+          <p>Dépenses Totales</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-item">
+        <div class="summary-icon remaining">
+          <i data-lucide="piggy-bank"></i>
+        </div>
+        <div class="summary-content">
+          <h3>{{ budgetSummary.totalRemaining | currency:'EUR':'symbol':'1.2-2' }}</h3>
+          <p>Budget Restant</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-item">
+        <div class="summary-icon warning" [class.danger]="budgetSummary.budgetCount > 0">
+          <i data-lucide="alert-triangle"></i>
+        </div>
+        <div class="summary-content">
+          <h3>{{ budgetSummary.budgetCount }}</h3>
+          <p>Budgets</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Budget List -->
+  <div *ngIf="!loading && budgets.length > 0" class="budget-list">
+    <h2>Vos Budgets</h2>
+    
+    <div class="budget-grid">
+      <div 
+        *ngFor="let budget of budgets; trackBy: trackByBudgetId" 
+        class="budget-card"
+        [class.over-budget]="isOverBudget(budget)"
+        [class.warning]="getBudgetStatus(budget) === 'warning'"
+        [class.safe]="getBudgetStatus(budget) === 'safe'">
+        
+        <div class="budget-card-header">
+          <div class="category-info">
+            <h3>{{ getCategoryName(budget?.categoryId?.toString() || 'Inconnu') }}</h3>
+
+            <p class="budget-dates">Budget mensuel</p>
           </div>
+          <div class="budget-actions">
+            <button 
+              class="btn-icon" 
+              (click)="deleteBudget(budget.id.toString())"
+              title="Supprimer ce budget">
+              <i data-lucide="trash-2"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="budget-amounts">
+          <div class="amount-item">
+            <span class="amount-label">Dépensé</span>
+            <span class="amount-value spent">{{ budget.spent | currency:'EUR':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="amount-separator">/</div>
+          <div class="amount-item">
+            <span class="amount-label">Budget</span>
+            <span class="amount-value total">{{ budget.monthlyLimit | currency:'EUR':'symbol':'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <div class="budget-progress">
           <div class="progress-bar">
-            <div class="progress-fill"
-                 [ngClass]="{
-                   'warning': budget.spent / budget.budget > 0.8 && budget.spent / budget.budget <= 1,
-                   'danger': budget.spent / budget.budget > 1
-                 }"
-                 [style.width.%]="(budget.spent / budget.budget) * 100"></div>
+            <div 
+              class="progress-fill" 
+              [style.width.%]="getBudgetProgress(budget)"
+              [class.progress-danger]="getBudgetStatus(budget) === 'danger'"
+              [class.progress-warning]="getBudgetStatus(budget) === 'warning'"
+              [class.progress-safe]="getBudgetStatus(budget) === 'safe'">
+            </div>
           </div>
-          <div class="budget-stats">
-            <span>Dépensé: {{ budget.spent | number:'1.2-2' }} €</span>
-            <span>{{ budget.spent > budget.budget ? 'Dépassement' : 'Restant' }}: {{ (budget.budget - budget.spent) | number:'1.2-2' }} €</span>
+          <div class="progress-text">
+            <span>{{ getBudgetProgress(budget) | number:'1.1-1' }}%</span>
+            <span class="remaining" [class.over-budget]="isOverBudget(budget)">
+              <span *ngIf="!isOverBudget(budget)">
+                Restant: {{ getRemainingBudget(budget) | currency:'EUR':'symbol':'1.2-2' }}
+              </span>
+              <span *ngIf="isOverBudget(budget)" class="over-budget-text">
+                Dépassement: {{ (budget.spent - budget.monthlyLimit) | currency:'EUR':'symbol':'1.2-2' }}
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <div class="budget-card-footer">
+          <div class="spending-controls">
+            <button 
+              class="btn btn-sm btn-outline"
+              (click)="addSpending(budget.id.toString(), 10)">
+              +10€
+            </button>
+            <button 
+              class="btn btn-sm btn-outline"
+              (click)="addSpending(budget.id.toString(), 50)">
+              +50€
+            </button>
+            <button 
+              class="btn btn-sm btn-outline"
+              (click)="addSpending(budget.id.toString(), 100)">
+              +100€
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <app-budget-config-modal
-      [isOpen]="showConfigModal"
-      [categories]="categories"
-      [existingBudgets]="existingBudgetConfigs"
-      [userId]="currentUserId"
-      (close)="closeConfigModal()"
-      (save)="saveBudgetConfig($event)">
-    </app-budget-config-modal>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && budgets.length === 0 && !error" class="empty-state">
+    <div class="empty-content">
+      <i data-lucide="wallet"></i>
+      <h2>Aucun budget configuré</h2>
+      <p>Commencez par configurer vos premiers budgets pour suivre vos dépenses mensuelles.</p>
+      <button class="btn btn-primary" (click)="openConfigModal()">
+        <i data-lucide="plus"></i>
+        Créer mon premier budget
+      </button>
+    </div>
+  </div>
+
+  <!-- Budget Configuration Modal -->
+  <app-budget-config-modal
+    [isOpen]="showConfigModal"
+    [categories]="categories"
+    [existingBudgets]="getExistingBudgetConfigs()"
+    (close)="closeConfigModal()"
+    (save)="saveBudgetConfig($event)">
+  </app-budget-config-modal>
+</div>
