@@ -10,7 +10,7 @@
         class="btn btn-primary" 
         (click)="openConfigModal()"
         [disabled]="loading">
-        <i data-lucide="settings"></i>
+        <i class="fa-solid fa-gear"></i>
         Configurer les Budgets
       </button>
     </div>
@@ -25,12 +25,12 @@
   <!-- Error State -->
   <div *ngIf="error && !loading" class="error-container">
     <div class="error-content">
-      <i data-lucide="alert-circle"></i>
+      <i class="fa-solid fa-circle-exclamation"></i>
       <h3>Erreur</h3>
       <p>{{ error }}</p>
       <div class="error-actions">
         <button class="btn btn-primary" (click)="retry()">
-          <i data-lucide="refresh-cw"></i>
+          <i class="fa-solid fa-rotate-right"></i>
           Réessayer
         </button>
         <button class="btn btn-outline" (click)="clearError()">
@@ -45,7 +45,7 @@
     <div class="summary-card">
       <div class="summary-item">
         <div class="summary-icon total">
-          <i data-lucide="wallet"></i>
+          <i class="fa-solid fa-wallet"></i>
         </div>
         <div class="summary-content">
           <h3>{{ budgetSummary.totalMonthlyLimit | currency:'EUR':'symbol':'1.2-2' }}</h3>
@@ -57,7 +57,7 @@
     <div class="summary-card">
       <div class="summary-item">
         <div class="summary-icon spent">
-          <i data-lucide="trending-up"></i>
+          <i class="fa-solid fa-arrow-trend-up"></i>
         </div>
         <div class="summary-content">
           <h3>{{ budgetSummary.totalSpent | currency:'EUR':'symbol':'1.2-2' }}</h3>
@@ -69,7 +69,7 @@
     <div class="summary-card">
       <div class="summary-item">
         <div class="summary-icon remaining">
-          <i data-lucide="piggy-bank"></i>
+          <i class="fa-solid fa-piggy-bank"></i>
         </div>
         <div class="summary-content">
           <h3>{{ budgetSummary.totalRemaining | currency:'EUR':'symbol':'1.2-2' }}</h3>
@@ -81,7 +81,7 @@
     <div class="summary-card">
       <div class="summary-item">
         <div class="summary-icon warning" [class.danger]="budgetSummary.budgetCount > 0">
-          <i data-lucide="alert-triangle"></i>
+          <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
         <div class="summary-content">
           <h3>{{ budgetSummary.budgetCount }}</h3>
@@ -106,7 +106,6 @@
         <div class="budget-card-header">
           <div class="category-info">
             <h3>{{ getCategoryName(budget?.categoryId?.toString() || 'Inconnu') }}</h3>
-
             <p class="budget-dates">Budget mensuel</p>
           </div>
           <div class="budget-actions">
@@ -114,7 +113,7 @@
               class="btn-icon" 
               (click)="deleteBudget(budget.id.toString())"
               title="Supprimer ce budget">
-              <i data-lucide="trash-2"></i>
+              <i class="fa-solid fa-trash"></i>
             </button>
           </div>
         </div>
@@ -180,11 +179,11 @@
   <!-- Empty State -->
   <div *ngIf="!loading && budgets.length === 0 && !error" class="empty-state">
     <div class="empty-content">
-      <i data-lucide="wallet"></i>
+      <i class="fa-solid fa-wallet"></i>
       <h2>Aucun budget configuré</h2>
       <p>Commencez par configurer vos premiers budgets pour suivre vos dépenses mensuelles.</p>
       <button class="btn btn-primary" (click)="openConfigModal()">
-        <i data-lucide="plus"></i>
+        <i class="fa-solid fa-plus"></i>
         Créer mon premier budget
       </button>
     </div>

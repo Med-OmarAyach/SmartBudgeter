@@ -111,56 +111,43 @@ export class BudgetComponent implements OnInit, AfterViewInit {
   }
 
   saveBudgetConfig(data: { 
-    budgets: BudgetConfig[], 
-    alertSettings: { warningThreshold: number } 
-  }) {
-    this.loading = true;
-    const promises: Promise<any>[] = [];
+  budgets: BudgetConfig[], 
+  alertSettings: { warningThreshold: number } 
+}) {
+  this.loading = true;
+  const promises: Promise<any>[] = [];
 
-    // Process each budget configuration
-    data.budgets.forEach((budgetConfig) => {
-      const existingBudget = this.budgets.find(b => b.categoryId === budgetConfig.category_id);
-      
-        // Create new budget
-const promise = new Promise<void>((resolve, reject) => {
-  this.budgetService.create({
-    category_id: budgetConfig.category_id,
-    monthlyLimit: budgetConfig.monthlyLimit
-  }).subscribe({
-    next: (response) => {
-      console.log('Create budget response:', response); // ✅ log response here
-      resolve();
-    },
-    error: (err) => {
-      console.error('Create budget error:', err); // optional error log
-      reject(err);
-    }
+  // Process each budget configuration
+
+
+  // Save alert settings
+ /* const alertSettingsPromise = new Promise<void>((resolve, reject) => {
+    this.budgetService.saveAlertSettings(data.alertSettings).subscribe({
+      next: () => {
+        console.log('Alert settings saved:', data.alertSettings);
+        resolve();
+      },
+      error: (err) => {
+        console.error('Error saving alert settings:', err);
+        reject(err);
+      }
+    });
   });
-});
-promises.push(promise);
-
-      })
-    ;
-
-    // Handle deleted budgets (budgets that exist but are not in the new configuration)
-  
-
-    // Execute all operations
-    Promise.all(promises)
-      .then(() => {
-        // TODO: Save alert settings to backend or local storage
-        console.log('Alert settings:', data.alertSettings);
-        
-        this.loadData(); // Reload all data
-
-        this.closeConfigModal();
-      })
-      .catch(err => {
-        console.error('Error saving budget config:', err);
-        this.loading = false;
-      });
-  }
-
+  promises.push(alertSettingsPromise);
+*/
+  // Execute all operations
+  Promise.all(promises)
+    .then(() => {
+      this.loadBudgetSummary(); // Reload summary
+      this.loadData(); // Reload all data
+      this.closeConfigModal();
+    })
+    .catch(err => {
+      console.error('Error saving budget config or alert settings:', err);
+      this.error = 'Failed to save budget configuration or alert settings';
+      this.loading = false;
+    });
+}
   deleteBudget(budgetId: string) {
     if (!confirm('Êtes-vous sûr de vouloir supprimer ce budget ?')) {
       return;
@@ -168,15 +155,12 @@ promises.push(promise);
 
     this.budgetService.delete(budgetId).subscribe({
       next: () => {
-        this.budgets = this.budgets.filter(b => b.id.toString() !== budgetId);
         console.log('Budget deleted:', budgetId);
-        this.loadBudgetSummary(); // Reload summary
-                this.loadData(); // Reload all data
-
+        this.loadData(); // Reload all data after deletion
       },
       error: (err) => {
-       
         console.error('Error deleting budget:', err);
+        this.loadData(); // Still reload data to ensure consistency
       }
     });
   }

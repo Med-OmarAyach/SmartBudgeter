@@ -84,7 +84,7 @@ declare const google: any;
 
 
         <div class="signup-link">
-          Don't have an account? <a href="#">Sign up</a>
+          Don't have an account? <a href="/register">Sign up</a>
         </div>
       </div>
     </div>
@@ -359,7 +359,6 @@ export class LoginComponent implements OnDestroy {
       this.errorMessage = null; // Clear error message when user starts typing
     });
 
-    // Debounce Google Sign-In clicks to prevent multiple popups
     
       }
 

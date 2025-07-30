@@ -7,7 +7,8 @@ import {
   CreateBudgetRequest, 
   UpdateBudgetRequest, 
   AddSpendingRequest, 
-  BudgetSummary 
+  BudgetSummary, 
+  AlertSettings
 } from '../models/budget.model';
 
 @Injectable({
@@ -84,6 +85,9 @@ delete(id: string): Observable<void> {
   getBudgetSummary(): Observable<BudgetSummary> {
     return this.http.get<BudgetSummary>(`${this.apiUrl}/summary/user`)
       .pipe(catchError(this.handleError));
+  }
+  saveAlertSettings(alertSettings: AlertSettings): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/alert-settings`, alertSettings);
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {

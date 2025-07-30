@@ -62,7 +62,7 @@ handleCredentialResponse = (response: any) => {
       localStorage.setItem('refreshToken', res.refreshToken);
 
       // Optionally navigate or emit success
-      this.router.navigate(['/dashboard']); // or wherever you want
+      this.router.navigate(['/b']); // or wherever you want
     },
     error: (err) => {
       console.error('Login failed:', err);

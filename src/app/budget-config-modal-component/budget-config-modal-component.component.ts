@@ -183,6 +183,8 @@ export class BudgetConfigModalComponent implements OnInit {
 
   closeModal() {
     this.clearMessages();
+          console.log('Saving budgets:', this.budgetConfigs),
+
     this.save.emit({ 
       budgets: [...this.budgetConfigs], // Send a copy to prevent mutations
       alertSettings: { ...this.alertSettings }
