@@ -226,3 +226,44 @@ canvas {
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+.edit-button {
+  margin-top: 10px;
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.edit-mode {
+  margin-top: 10px;
+}
+
+.balance-input {
+  width: 150px;
+  margin-bottom: 10px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.save-button, .cancel-button {
+  font-size: 12px;
+  min-width: 80px;
+}
+
+.input-group {
+  margin-bottom: 10px;
+}
+
+.error {
+  color: #f44336;
+}
+
+.change.up {
+  color: #4caf50;
+}
+
+.icon-circle.purple {
+  background-color: rgba(113, 4, 255, 0.3);
+}

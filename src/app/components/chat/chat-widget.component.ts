@@ -38,6 +38,7 @@ export class ChatWidgetComponent {
 
     try {
       const res: any = await this.http.post('http://localhost:8083/api/chat', {
+        userId:1,
         text: newUserMessage.text,
         sender: 'user',
       }).toPromise();

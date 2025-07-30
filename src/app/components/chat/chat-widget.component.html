@@ -20,13 +20,13 @@
   <mat-divider></mat-divider>
 
   <mat-card-content class="chat-content">
-    <div *ngFor="let msg of messages" [ngClass]="msg.sender === 'user' ? 'user-msg' : 'bot-msg'">
-      <mat-card class="chat-bubble" [ngClass]="msg.sender">
-        {{ msg.text }}
-      </mat-card>
+  <div *ngFor="let msg of messages" [ngClass]="msg.sender === 'user' ? 'user-msg' : 'bot-msg'">
+    <div class="chat-bubble" [ngClass]="msg.sender">
+      {{ msg.text }}
     </div>
-    <div #messagesEnd></div>
-  </mat-card-content>
+  </div>
+  <div #messagesEnd></div>
+</mat-card-content>
 
   <div class="chat-input">
     <mat-form-field class="input-field" appearance="outline">
