@@ -47,7 +47,7 @@ export class MapsComponent implements OnInit {
             "featureType": "road",
             "elementType": "geometry.stroke",
             "stylers": [{
-                "color": "#808080"
+                "color": "#808380"
             }, {
                 "lightness": 54
             }]

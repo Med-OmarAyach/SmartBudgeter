@@ -25,7 +25,7 @@ import { NgChartsModule } from 'ng2-charts';
 import { LatestOrdersComponent } from '../../components/budget-table/latest-orders.component';
 import { MatDividerModule } from "@angular/material/divider";
 import { MatTableModule } from "@angular/material/table";
-
+import { RegisterComponent } from 'app/register/register.component';  
 @NgModule({
   imports: [
     CommonModule,

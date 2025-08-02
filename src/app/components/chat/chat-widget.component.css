@@ -45,7 +45,7 @@
   word-wrap: break-word;
   white-space: pre-wrap;
   margin: 2px 0;
-  min-width: 50px;
+  min-width: 70px;
 }
 
 .chat-bubble.user {

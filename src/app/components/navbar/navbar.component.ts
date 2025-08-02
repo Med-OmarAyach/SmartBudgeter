@@ -23,9 +23,9 @@ export class NavbarComponent implements OnInit {
     ngOnInit(){
       this.listTitles = ROUTES.filter(listTitle => listTitle);
       const navbar: HTMLElement = this.element.nativeElement;
-      this.toggleButton = navbar.getElementsByClassName('navbar-toggler')[0];
+      //this.toggleButton = navbar.getElementsByClassName('navbar-toggler')[0];
       this.router.events.subscribe((event) => {
-        this.sidebarClose();
+       //this.sidebarClose();
          var $layer: any = document.getElementsByClassName('close-layer')[0];
          if ($layer) {
            $layer.remove();
@@ -33,7 +33,7 @@ export class NavbarComponent implements OnInit {
          }
      });
     }
-
+/*
     sidebarOpen() {
         const toggleButton = this.toggleButton;
         const body = document.getElementsByTagName('body')[0];
@@ -50,11 +50,11 @@ export class NavbarComponent implements OnInit {
         this.toggleButton.classList.remove('toggled');
         this.sidebarVisible = false;
         body.classList.remove('nav-open');
-    };
+    };*/
     sidebarToggle() {
         // const toggleButton = this.toggleButton;
         // const body = document.getElementsByTagName('body')[0];
-        var $toggle = document.getElementsByClassName('navbar-toggler')[0];
+      /*  var $toggle = document.getElementsByClassName('navbar-toggler')[0];
 
         if (this.sidebarVisible === false) {
             this.sidebarOpen();
@@ -107,7 +107,7 @@ export class NavbarComponent implements OnInit {
             this.mobile_menu_visible = 1;
 
         }
-    };
+    */};
 
     getTitle(){
       var titlee = this.location.prepareExternalUrl(this.location.path());

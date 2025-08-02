@@ -97,3 +97,6 @@ table {
 .warn {
   background-color: #f44336; /* red */
 }
+.progress-column {
+  margin-left: 10px;
+}

@@ -17,7 +17,6 @@
         <h2 *ngIf="balanceError" class="error">
           {{ balanceError }}
         </h2>
-        <p class="change up">↑ 12% Since last month</p>
         <button mat-button color="primary" (click)="toggleEditBalance()" class="edit-button">
           <mat-icon>edit</mat-icon>
           Edit Balance
@@ -68,7 +67,6 @@
       <h2 *ngIf="expensesError" class="error">
         {{ expensesError }}
       </h2>
-      <p class="change down">↓ 16% Since last month</p>
     </div>
     <div class="icon-circle teal">
       <mat-icon class="card-icon" style="color: white;">money_off</mat-icon>
@@ -80,8 +78,8 @@
     <div class="card-content">
       <div>
         <h4>BUDGET USED</h4>
-        <h2>75.5%</h2>
-        <mat-progress-bar mode="determinate" value="75.5"></mat-progress-bar>
+        <h2>{{monthlyExpenses/currentBalance*100}}%</h2>
+        <mat-progress-bar mode="determinate" value="{{(monthlyExpenses/currentBalance*100).toFixed()}}"></mat-progress-bar>
         <p class="change up" style="margin-top: 8px;">On track</p>
       </div>
       <div class="icon-circle orange">
@@ -107,18 +105,27 @@
 
     <!-- Pie Chart -->
     <div class="col-md-6">
-      <div class="chart-card">
-        <h5 class="chart-title">PIE CHART</h5>
-        <canvas baseChart
-                [datasets]="pieChartData"
-                [labels]="pieChartLabels"
-                [options]="pieChartOptions"
-                [type]="'pie'">
-        </canvas>
-      </div>
+  <div class="chart-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+  <h5 class="chart-title">Expense Distribution</h5>
+  <button mat-button (click)="refreshChart()" style="font-size: 12px;">
+    <mat-icon style="font-size: 16px;">refresh</mat-icon>
+    Refresh
+  </button>
+</div>
+
+    
+    <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
+      <canvas baseChart
+              [datasets]="pieChartData"
+              [labels]="pieChartLabels"
+              [options]="pieChartOptions"
+              [type]="'pie'">
+      </canvas>
     </div>
   </div>
-<app-latest-orders [orders]="orders"></app-latest-orders>
+</div>
+<app-latest-orders class="budgets" [orders]="orders"></app-latest-orders>
 </div>
 
   </div>

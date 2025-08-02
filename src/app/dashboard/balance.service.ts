@@ -12,13 +12,16 @@ export class BalanceService {
   constructor(private http: HttpClient) { }
 
   getBalance(userId: number): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/register/balance/${userId}`);
+    return this.http.get<number>(`${this.apiUrl}/user/balance/${userId}`);
   }
   getMonthlyExpenses(userId: number): Observable<number> {
     return this.http.get<number>(`${this.apiUrl}/expenses/last-month-total/${userId}`);
   }
 
   updateBalance(userId: number, newBalance: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/register/balance/${userId}`, newBalance);
+    return this.http.put(`${this.apiUrl}/user/balance/${userId}`, newBalance);
+  }
+  getCategorySummaryForUser(userId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/categories/summary/user/${userId}`);
   }
 }

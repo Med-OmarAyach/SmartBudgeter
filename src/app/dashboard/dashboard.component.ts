@@ -84,7 +84,8 @@ export class DashboardComponent implements OnInit {
       left: -30
     }
   ];
-
+  public pieChartLabels: string[] = [];
+  public pieChartData: any[] = [];
   private hashString(str: string): number {
     let hash = 5381;
     for (let i = 0; i < str.length; i++) {
@@ -114,23 +115,58 @@ export class DashboardComponent implements OnInit {
     },
   };
 
-  public pieChartLabels: string[] = ['Rent Sales','Phone', 'Food', 'Internet', 'Transport', 'Entertainment', 'Other'];
-
-  private pieData = [300, 300, 200, 100, 50, 47, 63];
-
-  // Automatically generate a random color per data point
-  public pieChartData: any[] = [
-    {
-      data: this.pieData,
-      label: 'Sales',
-      backgroundColor: this.pieChartLabels.map(label => this.getColorForLabel(label))
+  // REPLACE your current loadChartData() with this:
+loadChartData(): void {
+  const currentUserId = 1; // Get from your auth service
+  this.balanceService.getCategorySummaryForUser(currentUserId).subscribe({
+    next: (data) => {
+      console.log('Raw API data:', data);
+      
+      if (data && data.length > 0) {
+        const labels = data.map((item: any) => item.categoryName);
+        const amounts = data.map((item: any) => item.totalAmount);
+        const backgroundColors = labels.map((label: string) => this.getColorForLabel(label));
+        
+        this.pieChartLabels = labels;
+        this.pieChartData = [{
+          data: amounts,
+          label: 'Expenses',
+          backgroundColor: backgroundColors
+        }];
+        
+        console.log('Chart labels:', this.pieChartLabels);
+        console.log('Chart data:', this.pieChartData);
+      } else {
+        console.log('No data available for pie chart');
+        // Handle empty data
+        this.pieChartLabels = ['No Data'];
+        this.pieChartData = [{
+          data: [1],
+          label: 'Expenses',
+          backgroundColor: ['rgba(200, 200, 200, 0.6)']
+        }];
+      }
+    },
+    error: (error) => {
+      console.error('Error loading chart data:', error);
+      // Handle error case
+      this.pieChartLabels = ['Error'];
+      this.pieChartData = [{
+        data: [1],
+        label: 'Expenses',
+        backgroundColor: ['rgba(255, 0, 0, 0.6)']
+      }];
     }
-  ];
-
+  });
+}
+refreshChart(): void {
+  this.loadChartData();
+}
    constructor(private balanceService: BalanceService) {}
 
   ngOnInit() {
     this.loadAllData();
+    this.loadChartData(); 
   }
 
   loadAllData() {

@@ -1,0 +1,576 @@
+/* Sign-In Form Styles */
+.sign-in-form {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 3rem 2.5rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(18, 22, 33, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.sign-in-form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #121621 0%, #2a3441 100%);
+}
+
+/* Header Styles */
+.sign-in-form h2 {
+  color: #121621;
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.sign-in-form > p {
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin-bottom: 2.5rem;
+}
+
+.sign-in-form > p a {
+  color: #121621;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.sign-in-form > p a:hover {
+  color: #2a3441;
+  text-decoration: underline;
+}
+
+/* Form Styles */
+.sign-in-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Material Form Field Overrides */
+.sign-in-form .mat-mdc-form-field {
+  width: 100%;
+}
+
+.sign-in-form .mat-mdc-form-field .mat-mdc-text-field-wrapper {
+  border-radius: 12px;
+  background-color: #f8fafc;
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.sign-in-form .mat-mdc-form-field:hover .mat-mdc-text-field-wrapper {
+  border-color: #121621;
+  background-color: #f1f5f9;
+}
+
+.sign-in-form .mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
+  border-color: #121621 !important;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(18, 22, 33, 0.1);
+  
+}
+
+.sign-in-form .mat-mdc-form-field-label {
+  color: #374151 !important;
+  font-weight: 500;
+}
+
+.sign-in-form .mat-mdc-form-field.mat-focused .mat-mdc-form-field-label {
+  color: #121621 !important;
+}
+
+.sign-in-form .mat-mdc-input-element {
+  color: #121621;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 1rem;
+    width: 95%;
+
+}
+
+.sign-in-form .mat-mdc-input-element::placeholder {
+  color: #9ca3af;
+}
+
+/* Validation Icons */
+.sign-in-form .validation-icon.valid {
+  color: #10b981;
+}
+
+.sign-in-form .validation-icon.invalid {
+  color: #ef4444;
+}
+
+/* Error Messages */
+.sign-in-form .mat-mdc-form-field-error {
+  color: #ef4444;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+/* Form Options Row */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.sign-in-form .mat-mdc-checkbox {
+  --mdc-checkbox-selected-checkmark-color: white;
+  --mdc-checkbox-selected-focus-icon-color: #121621;
+  --mdc-checkbox-selected-hover-icon-color: #121621;
+  --mdc-checkbox-selected-icon-color: #121621;
+  --mdc-checkbox-selected-pressed-icon-color: #121621;
+}
+
+.sign-in-form .mat-mdc-checkbox .mdc-form-field {
+  color: #374151;
+  font-weight: 500;
+}
+
+.forgot-link a {
+  color: #121621;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.forgot-link a:hover {
+  color: #2a3441;
+  text-decoration: underline;
+}
+
+/* Message Styles */
+.error-message,
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 1rem 0;
+}
+
+.error-message {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.success-message {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.error-message .mat-icon,
+.success-message .mat-icon {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Submit Button */
+.sign-in-form button[type="submit"] {
+  background: #121621 !important;
+  color: white !important;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 1rem;
+  border-radius: 12px;
+  text-transform: none;
+  letter-spacing: 0.025em;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.sign-in-form button[type="submit"]:not([disabled]):hover {
+  background: #2a3441 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(18, 22, 33, 0.3);
+}
+
+.sign-in-form button[type="submit"]:disabled {
+  background: #9ca3af !important;
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.sign-in-form button[type="submit"].loading {
+  background: #4b5563 !important;
+}
+
+/* Divider */
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 2rem 0 1.5rem;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.divider span {
+  background: white;
+  color: #6b7280;
+  padding: 0 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  position: relative;
+}
+
+/* Social Buttons */
+.social-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.social-btn {
+  flex: 1;
+  padding: 0.875rem !important;
+  border: 2px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  background: white !important;
+  color: #374151 !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  transition: all 0.3s ease !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.social-btn:hover {
+  border-color: #121621 !important;
+  background: #f8fafc !important;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(18, 22, 33, 0.1);
+}
+
+.google-btn .mat-icon {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Security Notice */
+.security-notice {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.security-notice p {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.security-notice p::before {
+  content: '🔒';
+  font-size: 0.9rem;
+}
+
+/* Footer Links */
+.form-footer {
+  border-top: 1px solid #f3f4f6;
+  padding-top: 1.5rem;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #121621;
+}
+
+.divider-dot {
+  color: #d1d5db;
+  font-weight: bold;
+}
+
+/* Password Toggle Button */
+.sign-in-form button[mat-icon-button] {
+  color: #6b7280 !important;
+  transition: color 0.2s ease;
+}
+
+.sign-in-form button[mat-icon-button]:hover {
+  color: #121621 !important;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .sign-in-form {
+    margin: 1rem;
+    padding: 2rem 1.5rem;
+    max-width: none;
+  }
+  
+  .sign-in-form h2 {
+    font-size: 1.75rem;
+  }
+  
+  .form-options {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .footer-links {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .divider-dot {
+    display: none;
+  }
+}
+
+/* Loading Animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.sign-in-form button[type="submit"].loading span {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Focus States for Accessibility */
+.sign-in-form a:focus,
+.sign-in-form button:focus {
+  outline: 2px solid #121621;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Enhanced Visual Hierarchy */
+.sign-in-form .mat-mdc-form-field-subscript-wrapper {
+  margin-top: 0.25rem;
+}
+
+/* Smooth Transitions */
+* {
+  transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+/* Ensure full width and alignment for inputs with suffix buttons */
+.sign-in-form .mat-mdc-form-field .mat-mdc-text-field-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.sign-in-form .mat-mdc-form-field .mat-mdc-form-field-infix {
+  display: flex;
+  align-items: center;
+  padding-right: 0.5rem; /* spacing before suffix */
+}
+
+.sign-in-form .mat-mdc-input-element {
+  width: 100% !important; /* was 95%, now full width */
+  padding: 1rem 0.5rem 1rem 1rem; /* reduce right padding */
+  box-sizing: border-box;
+}
+
+.sign-in-form .mat-mdc-form-field .mat-icon-button {
+  margin-right: 0.25rem;
+}
+
+.sign-in-form .mat-mdc-form-field .mat-icon-button .mat-icon {
+  font-size: 20px;
+}
+
+/* Optional: align icon vertically better */
+.sign-in-form .mat-mdc-form-field .mat-icon-button {
+  height: 36px;
+  width: 36px;
+}
+/* Improve spacing between input and icon */
+.sign-in-form .mat-mdc-form-field .mat-icon-button {
+  padding: 0;
+  height: 40px;
+  width: 40px;
+  margin-left: 4px;
+}
+
+/* Make the icon a bit smaller */
+.sign-in-form .mat-mdc-form-field .mat-icon-button .mat-icon {
+  font-size: 22px;
+  color: #6b7280; /* Gray-ish, you can change */
+}
+
+/* Hover effect */
+.sign-in-form .mat-mdc-form-field .mat-icon-button:hover .mat-icon {
+  color: #111827; /* Darker gray */
+}
+
+/* Modern password field enhancements */
+.modern-password-field .mat-mdc-text-field-wrapper {
+  border-radius: 12px;
+  background-color: #f9fafb;
+  border: 2px solid #e2e8f0;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modern-password-field:hover .mat-mdc-text-field-wrapper {
+  border-color: #94a3b8;
+  background-color: #f1f5f9;
+}
+
+.modern-password-field.mat-focused .mat-mdc-text-field-wrapper {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  background-color: #ffffff;
+}
+
+.modern-password-field .mat-mdc-input-element {
+  padding: 1rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.modern-password-field .mat-mdc-form-field-infix {
+  display: flex;
+  align-items: center;
+}
+
+.modern-password-field .mat-icon-button {
+  height: 40px;
+  width: 40px;
+  padding: 0;
+  margin-left: 4px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.modern-password-field .mat-icon-button:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+
+
+.modern-password-field .mat-icon-button:hover .mat-icon {
+  color: #1f2937;
+}
+/* Make the icon button look clean and inline */
+.modern-password-field .mat-icon-button {
+  background: none;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+  min-width: auto;
+  height: auto;
+  width: auto;
+  line-height: 1;
+}
+
+/* Make the icon size and color modern */
+.modern-password-field .mat-icon-button .mat-icon {
+  font-size: 22px;
+  color: #6b7280; /* neutral gray */
+  transition: color 0.2s ease;
+}
+
+/* Subtle hover effect */
+.modern-password-field .mat-icon-button:hover .mat-icon {
+  color: #111827; /* darker on hover */
+  cursor: pointer;
+}
+
+/* Optional: add focus ring when using keyboard */
+.modern-password-field .mat-icon-button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+.login-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: white; /* White background */
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+.signup-link {
+  text-align: center;
+  margin-top: 15px;
+}
