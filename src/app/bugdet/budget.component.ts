@@ -1,10 +1,12 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { BudgetService } from '../services/budget.service';
 import { CategoryService } from '../services/category.service';
+import { ExpenseService } from '../services/expense.service';
 import { CommonModule } from '@angular/common';
 import { BudgetConfigModalComponent } from '../budget-config-modal-component.component/budget-config-modal-component.component';
 import { Budget, BudgetConfig, BudgetSummary } from '../models/budget.model';
 import { Category } from '../models/category.model';
+import { Expense } from '../models/expense.model';
 @Component({
   selector: 'app-budget',
   templateUrl: './budget.component.html',
@@ -19,10 +21,14 @@ export class BudgetComponent implements OnInit, AfterViewInit {
   showConfigModal = false;
   loading = false;
   error: string | null = null;
+  existingBudgetConfigsForModal: BudgetConfig[] = [];
+
+  expenses: Expense[] = [];
 
   constructor(
-    private budgetService: BudgetService, 
-    private categoryService: CategoryService
+    private budgetService: BudgetService,
+    private categoryService: CategoryService,
+    private expenseService: ExpenseService
   ) {}
 
   ngOnInit() {
@@ -37,11 +43,12 @@ export class BudgetComponent implements OnInit, AfterViewInit {
   loadData() {
     this.loading = true;
     this.error = null;
-    
-    // Load budgets, categories, and summary
+
+    // Load budgets, categories, expenses, and summary
     Promise.all([
       this.loadBudgets(),
       this.loadCategories(),
+      this.loadExpenses(),
       this.loadBudgetSummary()
     ]).finally(() => {
       this.loading = false;
@@ -49,26 +56,60 @@ export class BudgetComponent implements OnInit, AfterViewInit {
       setTimeout(() => (window as any).lucide?.createIcons(), 100);
     });
   }
-
-  loadBudgets(): Promise<void> {
+  loadExpenses(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.budgetService.getCurrentUserBudgets().subscribe({
-        next: (data) => {
-          this.budgets = data;
-          console. log('Budgets loaded:', this.budgets);
+      this.expenseService.getCurrentUserExpenses().subscribe({
+        next: (expenses) => {
+          this.expenses = expenses;
+          // After loading expenses, update budget.spent for each budget
+          this.updateBudgetsSpent();
           resolve();
         },
         error: (err) => {
-          console.error('Failed to load budgets', err);
-          reject(err);
+          console.error('Failed to load expenses', err);
+          this.expenses = [];
+          resolve(); // Don't block other loads
         }
       });
     });
   }
 
+  updateBudgetsSpent() {
+    if (!this.budgets || !this.expenses) return;
+    this.budgets.forEach(budget => {
+      const totalSpent = this.expenses
+        .filter(exp => exp.categoryId === budget.categoryId)
+        .reduce((sum, exp) => sum + exp.amount, 0);
+      budget.spent = totalSpent;
+    });
+  }
+
+  loadBudgets(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    this.budgetService.getCurrentUserBudgets().subscribe({
+      next: (data) => {
+        this.budgets = data;
+        console.log('Budgets loaded:', this.budgets);
+        // --- Add this line ---
+        this.getExistingBudgetConfigs(); // Populate existingBudgetConfigsForModal
+        // --- End of addition ---
+        resolve();
+      },
+      error: (err) => {
+        console.error('Failed to load budgets', err);
+        // --- Optionally reset the modal input on error ---
+        // this.existingBudgetConfigsForModal = [];
+        // --- End of optional addition ---
+        reject(err);
+      }
+    });
+  });
+}
+
+
   loadCategories(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.categoryService.getByUserId().subscribe({
+      this.categoryService.getAllForCurrentUser().subscribe({
         next: (categories) => {
           this.categories = categories;
           resolve();
@@ -102,12 +143,13 @@ export class BudgetComponent implements OnInit, AfterViewInit {
     this.showConfigModal = true;
   }
 
-  closeConfigModal() {
+  closeModal() {
     this.showConfigModal = false;
- this.loadBudgetSummary(); // Reload summary
-                this.loadData();
-
-  }
+    // Reload data to reflect any changes made in the modal
+    this.loadData(); // This includes loadBudgetSummary()
+    // Optionally remove the separate loadBudgetSummary() call if loadData() handles it
+    // this.loadBudgetSummary(); // Redundant if loadData() already does this
+}
 
   saveBudgetConfig(data: { 
   budgets: BudgetConfig[], 
@@ -139,7 +181,7 @@ export class BudgetComponent implements OnInit, AfterViewInit {
     .then(() => {
       this.loadBudgetSummary(); // Reload summary
       this.loadData(); // Reload all data
-      this.closeConfigModal();
+      this.closeModal();
     })
     .catch(err => {
       console.error('Error saving budget config or alert settings:', err);
@@ -165,28 +207,40 @@ export class BudgetComponent implements OnInit, AfterViewInit {
   }
 
   addSpending(budgetId: string, amount: number) {
-    this.budgetService.addSpending(budgetId, { amount }).subscribe({
-      next: (updatedBudget) => {
-        // Update the budget in the list
-        const index = this.budgets.findIndex(b => b.id.toString() === budgetId);
-        if (index !== -1) {
-          this.budgets[index] = updatedBudget;
-        }
-        this.loadBudgetSummary(); // Reload summary
+    // Find the budget to get its categoryId
+    const budget = this.budgets.find(b => b.budgetId.toString() === budgetId);
+    if (!budget) {
+      console.error('Budget not found for adding spending:', budgetId);
+      return;
+    }
+    // Create a new expense for this category
+    const expenseData = {
+      category: { id: budget.categoryId },
+      amount: amount,
+      note: 'Added via budget control',
+      date: new Date().toISOString()
+    };
+    this.expenseService.create(expenseData).subscribe({
+      next: (newExpense) => {
+        // Reload expenses and budgets to update spent
+        this.loadExpenses().then(() => {
+          this.updateBudgetsSpent();
+          this.loadBudgetSummary();
+        });
       },
       error: (err) => {
-        console.error('Error adding spending:', err);
+        console.error('Error adding expense:', err);
       }
     });
   }
 
-  getCategoryName(categoryId: string): string {
-      console.log('Category ID:', categoryId);
-
-    const category = this.categories.find(c => c.id.toString() === categoryId)
-  console.log('Category ID:', categoryId, 'Found:', category);
-    return category ? category.name : 'Unknown Category';
-  }
+  // budget.component.ts
+getCategoryName(categoryId: number): string { // Assuming categoryId is a number in Budget/Category
+    console.log('Looking for category ID (number):', categoryId);
+    const category = this.categories.find(c => c.id === Number(categoryId));
+    console.log('Category ID:', categoryId, 'Found:', category);
+    return category ? category.name : 'Catégorie Inconnue';
+}
 
   getBudgetProgress(budget: Budget): number {
     if (budget.monthlyLimit === 0) return 0;
@@ -208,13 +262,19 @@ export class BudgetComponent implements OnInit, AfterViewInit {
     return budget.spent > budget.monthlyLimit;
   }
 
-  getExistingBudgetConfigs(): BudgetConfig[] {
-    return this.budgets.map(budget => ({
-      category_id: budget.categoryId,
-      monthlyLimit: budget.monthlyLimit,
-      spent: budget.spent
-    }));
-  }
+  getExistingBudgetConfigs(): BudgetConfig[] { // Keep return type for now
+  const configs = this.budgets.map(budget => ({
+    category_id: budget.categoryId,
+    monthlyLimit: budget.monthlyLimit,
+    // spent: budget.spent // Remove if not needed by BudgetConfig interface
+  }));
+
+  // Update the dedicated property
+  this.existingBudgetConfigsForModal = configs;
+
+  // Return the value (optional, if still called directly elsewhere)
+  return configs;
+}
 
   retry() {
 this.loadBudgetSummary(); // Reload summary
@@ -224,6 +284,12 @@ this.loadBudgetSummary(); // Reload summary
     this.error = null;
   }
 
-  trackByBudgetId(index: number, budget: Budget): string {
-    return budget.id.toString();
-  }}
+  // budget.component.ts
+trackByBudgetId(index: number, budget: Budget): string {
+    // Handle case where budget.budgetId might be undefined
+    if (budget.budgetId === undefined || budget.budgetId === null) {
+        console.warn(`Budget at index ${index} is missing a 'budgetId'. Using index as fallback for trackBy.`);
+        return index.toString(); // Fallback to index
+    }
+    return budget.budgetId.toString();
+}}

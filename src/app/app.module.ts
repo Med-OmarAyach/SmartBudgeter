@@ -36,7 +36,8 @@ import { MatTableModule } from '@angular/material/table';
     MatInputModule,
     MatDividerModule,
     BrowserModule,
-    MatTableModule
+    MatTableModule,
+    FormsModule // <-- Ensure FormsModule is imported for ngModel
   ],
   declarations: [
     AppComponent,

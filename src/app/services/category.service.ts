@@ -1,8 +1,25 @@
+// category.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Category, CreateCategoryRequest, UpdateCategoryRequest } from '../models/category.model';
+import { AuthService } from './auth.service'; // Adjust path if needed
+import { Category } from '../models/category.model'; // Adjust path if needed
+
+// Define interfaces for structured responses if not already done
+interface CategorySummary {
+  categoryName: string;
+  categoryId: number;
+  totalAmount: number;
+  expenseCount: number;
+}
+
+interface CategoryWithExpenses {
+  category: Category;
+  expenses: any[]; // Define a proper Expense model
+  totalAmount: number;
+  expenseCount: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -10,85 +27,108 @@ import { Category, CreateCategoryRequest, UpdateCategoryRequest } from '../model
 export class CategoryService {
   private readonly apiUrl = 'http://localhost:8083/api/categories';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
-  // Create category
-  create(request: CreateCategoryRequest): Observable<Category> {
-    const payload = {
-      name: request.name,
-    };
-    return this.http.post<Category>(this.apiUrl, payload)
+  // --- Helper method to get common headers (Authorization) ---
+  private getHeaders(): HttpHeaders {
+    return this.authService.getAuthHeaders();
+  }
+
+  // Create a new category for the current user
+  create(category: { name: string }): Observable<Category> {
+    const headers = this.getHeaders();
+    // The backend will associate the category with the user from the JWT
+    return this.http.post<Category>(this.apiUrl, category, { headers })
       .pipe(catchError(this.handleError));
   }
 
-  // Get all categories
-  getCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(this.apiUrl)
+  // Get all categories for the CURRENT user
+  // Calls backend endpoint: GET /api/categories/user
+  getAllForCurrentUser(): Observable<Category[]> {
+    const headers = this.getHeaders();
+    return this.http.get<Category[]>(`${this.apiUrl}/user`, { headers })
       .pipe(catchError(this.handleError));
   }
 
-  // Get category by ID
-  getById(id: string): Observable<Category> {
-    return this.http.get<Category>(`${this.apiUrl}/${id}`)
+  // Get a specific category by ID (backend checks ownership)
+  // Calls backend endpoint: GET /api/categories/{id}
+  getById(id: number): Observable<Category> {
+    const headers = this.getHeaders();
+    return this.http.get<Category>(`${this.apiUrl}/${id}`, { headers })
       .pipe(catchError(this.handleError));
   }
 
-  // Get categories by user
-  getByUserId(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${this.apiUrl}/user`)
+  // Update a specific category by ID (backend checks ownership)
+  // Calls backend endpoint: PUT /api/categories/{id}
+  update(id: number, category: Partial<Category>): Observable<Category> {
+     const headers = this.getHeaders();
+     return this.http.put<Category>(`${this.apiUrl}/${id}`, category, { headers })
+       .pipe(catchError(this.handleError));
+   }
+
+  // Delete a specific category by ID (backend checks ownership)
+  // Calls backend endpoint: DELETE /api/categories/{id}
+  delete(id: number): Observable<void> {
+    const headers = this.getHeaders();
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers })
       .pipe(catchError(this.handleError));
   }
 
-  // Update category
-  update(id: string, request: UpdateCategoryRequest): Observable<Category> {
-    return this.http.put<Category>(`${this.apiUrl}/${id}`, request)
+  // Get category summary for the CURRENT user
+  // Calls backend endpoint: GET /api/categories/summary/user
+  getSummaryForCurrentUser(): Observable<CategorySummary[]> {
+    const headers = this.getHeaders();
+    return this.http.get<CategorySummary[]>(`${this.apiUrl}/summary/user`, { headers })
       .pipe(catchError(this.handleError));
   }
 
-  // Delete category
-  delete(id: string): Observable<string> {
-    return this.http.delete<string>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
-  }
-
-  // Search categories by name
-  searchByName(name: string): Observable<Category[]> {
-    return this.http.get<Category[]>(`${this.apiUrl}/search`, {
-      params: { name }
-    }).pipe(catchError(this.handleError));
-  }
-
-  // Search categories by user and name
-  searchByUserIdAndName( name: string): Observable<Category[]> {
-    return this.http.get<Category[]>(`${this.apiUrl}/search/user`, {
-      params: { name }
-    }).pipe(catchError(this.handleError));
-  }
-
-  // Get categories with active budgets
-  getCategoriesWithActiveBudgets(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${this.apiUrl}/with-budgets`)
-      .pipe(catchError(this.handleError));
-  }
-
-  // Get categories without budgets for user
-  getCategoriesWithoutBudgets(): Observable<Category[]> {
-    return this.http.get<Category[]>(`${this.apiUrl}/without-budgets/user`)
+  // Get a specific category with its expenses (backend checks ownership)
+  // Calls backend endpoint: GET /api/categories/{id}/expenses
+  getCategoryWithExpenses(id: number): Observable<CategoryWithExpenses> {
+    const headers = this.getHeaders();
+    return this.http.get<CategoryWithExpenses>(`${this.apiUrl}/${id}/expenses`, { headers })
       .pipe(catchError(this.handleError));
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An unknown error occurred';
-    
     if (error.error instanceof ErrorEvent) {
-      // Client-side error
-      errorMessage = `Error: ${error.error.message}`;
+      // Client-side or network error
+      errorMessage = `Client Error: ${error.error.message}`;
     } else {
-      // Server-side error
-      errorMessage = error.error?.message || `Error Code: ${error.status}\nMessage: ${error.message}`;
+      // Server-side (HTTP) error
+      switch (error.status) {
+        case 0:
+          errorMessage = 'Network error or server is unreachable. Please check your connection.';
+          break;
+        case 400:
+          errorMessage = `Bad Request: ${error.error?.message || 'The request was invalid.'}`;
+          break;
+        case 401:
+          errorMessage = 'Unauthorized: Please log in again.';
+          // Consider triggering a logout
+          break;
+        case 403:
+          errorMessage = 'Forbidden: You do not have permission to perform this action.';
+          break;
+        case 404:
+          errorMessage = 'Not Found: The requested resource could not be found.';
+          break;
+        case 500:
+          errorMessage = 'Internal Server Error: Something went wrong on the server.';
+          break;
+        // Add other cases as needed
+        default:
+          errorMessage = error.error?.message || `Server Error Code: ${error.status}\nMessage: ${error.message}`;
+          break;
+      }
     }
-    
-    console.error('CategoryService Error:', errorMessage);
+
+    console.error(
+      `CategoryService Error:\n  Status: ${error.status}\n  Message: ${errorMessage}\n  URL: ${error.url}\n  Details:`,
+      error
+    );
+
     return throwError(() => new Error(errorMessage));
   }
 }

@@ -1,50 +1,64 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ExpenseService } from './expense.service';
-import { Expense } from './expense.model';
-
+import { ExpenseService } from '../services/expense.service'; // Adjust path as needed
+import { CreateExpenseRequest, Expense } from '../models/expense.model'; // Adjust path as needed
+import { AuthService } from '../services/auth.service'; // Adjust path as needed
+import { CategoryService } from '../services/category.service'; // Adjust path as needed
+import { CreateExpenseData, ExpenseModalComponent } from './add-expense/add-expense'; // Adjust path as needed
 @Component({
   selector: 'app-expense-table',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ExpenseModalComponent],
   template: `
     <div class="page-content fade-in-up">
+      <!-- Loading Spinner -->
+      <div *ngIf="loading" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Chargement des dépenses...</p>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="!loading && errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+        <button class="btn btn-outline" (click)="retryLoadExpenses()">Réessayer</button>
+      </div>
+
       <div class="page-header">
-        <h1 class="page-title">Historique des Dépenses</h1>
-        <button class="btn btn-primary" (click)="openAddExpenseModal()">
+        <h1 class="page-title">Expenses History</h1>
+        <button class="btn btn-primary" (click)="openAddExpenseModal()" [disabled]="loading">
           <i data-lucide="plus"></i>
-          Ajouter une Dépense
+          Add an expense
         </button>
       </div>
 
       <div class="card">
         <div class="filters">
           <div class="filter-group">
-            <label>Date de début</label>
-            <input type="date" class="form-control" [(ngModel)]="filters.startDate" (ngModelChange)="applyFilters()">
+            <label>Start datet</label>
+            <input type="date" class="form-control" [(ngModel)]="filters.startDate" (ngModelChange)="applyFilters()" [disabled]="loading">
           </div>
           <div class="filter-group">
-            <label>Date de fin</label>
-            <input type="date" class="form-control" [(ngModel)]="filters.endDate" (ngModelChange)="applyFilters()">
+            <label>End date</label>
+            <input type="date" class="form-control" [(ngModel)]="filters.endDate" (ngModelChange)="applyFilters()" [disabled]="loading">
           </div>
           <div class="filter-group">
-            <label>Catégorie</label>
-            <select class="form-control" [(ngModel)]="filters.category" (ngModelChange)="applyFilters()">
-              <option value="">Toutes les catégories</option>
-              <option value="alimentation">Alimentation</option>
-              <option value="transport">Transport</option>
-              <option value="loisirs">Loisirs</option>
-              <option value="sante">Santé</option>
+            <label>Category</label>
+            <select class="form-control" [(ngModel)]="filters.category" (ngModelChange)="applyFilters()" [disabled]="loading">
+              <option value="">All categories</option>
+              <!-- Populate categories dynamically if available -->
+              <option *ngFor="let category of availableCategories" [value]="category.id">
+                {{ category.name }}
+              </option>
             </select>
           </div>
           <div class="filter-group">
-            <label>Montant minimum</label>
-            <input type="number" class="form-control" [(ngModel)]="filters.minAmount" placeholder="0" (ngModelChange)="applyFilters()">
+            <label>Minimum</label>
+            <input type="number" class="form-control" [(ngModel)]="filters.minAmount" placeholder="0" (ngModelChange)="applyFilters()" [disabled]="loading">
           </div>
           <div class="filter-group">
-            <label>Montant maximum</label>
-            <input type="number" class="form-control" [(ngModel)]="filters.maxAmount" placeholder="1000" (ngModelChange)="applyFilters()">
+            <label>Maximum</label>
+            <input type="number" class="form-control" [(ngModel)]="filters.maxAmount" placeholder="1000" (ngModelChange)="applyFilters()" [disabled]="loading">
           </div>
         </div>
 
@@ -52,222 +66,149 @@ import { Expense } from './expense.model';
           <table class="table">
             <thead>
               <tr>
-                <th (click)="sortTable('date')">Date <i data-lucide="arrow-up-down"></i></th>
-                <th (click)="sortTable('description')">Description <i data-lucide="arrow-up-down"></i></th>
-                <th (click)="sortTable('category')">Catégorie <i data-lucide="arrow-up-down"></i></th>
-                <th (click)="sortTable('amount')">Montant <i data-lucide="arrow-up-down"></i></th>
-                <th>Actions</th>
+                <th (click)="sortTable('createdAt')" class="sortable">
+                  Date <i data-lucide="arrow-up-down"></i>
+                </th>
+                <th (click)="sortTable('note')" class="sortable">
+                  note <i data-lucide="arrow-up-down"></i>
+                </th>
+                <th (click)="sortTable('categoryId')" class="sortable">
+                  Category <i data-lucide="arrow-up-down"></i>
+                </th>
+                <th (click)="sortTable('amount')" class="sortable">
+                  Amount <i data-lucide="arrow-up-down"></i>
+                </th>
+                <th>Delete</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let expense of filteredExpenses">
-                <td>{{ expense.date }}</td>
-                <td>{{ expense.description }}</td>
-                <td>{{ expense.category }}</td>
+              <tr *ngFor="let expense of filteredExpenses || []; trackBy: trackByExpenseId">
+                <td>{{ expense.createdAt ? (expense.createdAt | date:'dd/MM/yyyy') : '' }}</td>
+                <td>{{ expense.note }}</td>
+                <td>{{ expense.category.name }}</td>
                 <td>{{ expense.amount | number:'1.2-2' }} €</td>
                 <td>
-                  <button class="btn btn-secondary" (click)="editExpense(expense.id)">
-                    <i data-lucide="edit"></i>
+                  <button class="btn btn-danger" (click)="deleteExpense(expense.expenseId)" [disabled]="loading">
+                    <i data-lucide="trash-2"></i>
                   </button>
+                </td>
+              </tr>
+              <tr *ngIf="!loading && filteredExpenses.length === 0">
+                <td colspan="5" class="text-center">
+                  no expenses found.
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
+      <app-expense-modal
+  [isOpen]="showAddExpenseModal"
+  [categories]="availableCategories"
+  (save)="onSaveNewExpense($event)"
+  (close)="closeAddExpenseModal()"
+></app-expense-modal>
     </div>
   `,
-  styles: [
-    `
-      .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        padding: 1.5rem 2rem;
-        border-radius: 10px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      }
-
-      .page-title {
-        font-size: 2rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #121621, #121621);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
-      .btn {
-        padding: 0.75rem 1.5rem;
-        border: none;
-        border-radius: 2px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-      }
-
-      .btn-primary {
-        background: linear-gradient(135deg, #121621, #121621);
-        color: white;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-      }
-
-      .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-      }
-
-      .btn-secondary {
-        background: rgba(255, 255, 255, 0.9);
-        color: #64748b;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-      }
-
-      .btn-secondary:hover {
-        background: white;
-        transform: translateY(-1px);
-      }
-
-      .card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 10px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        transition: all 0.3s ease;
-      }
-
-      .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-      }
-
-      .filters {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-      }
-
-      .filter-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-
-      .filter-group label {
-        font-weight: 600;
-        color: #64748b;
-        font-size: 0.9rem;
-      }
-
-      .form-control {
-        padding: 0.75rem 1rem;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        border-radius: 6px;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.9);
-      }
-
-      .form-control:focus {
-        outline: none;
-        border-color: #121621;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-      }
-
-      .table-container {
-        overflow-x: auto;
-        border-radius: 5px;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-      }
-
-      .table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      .table th {
-        background: linear-gradient(135deg, #121621, #121621);
-        color: white;
-        padding: 1rem 1.5rem;
-        text-align: left;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .table th:hover {
-        background: linear-gradient(135deg, #635BFF, #635BFF);
-      }
-
-      .table td {
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-      }
-
-      .table tbody tr:hover {
-        background: rgba(102, 126, 234, 0.05);
-      }
-
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .fade-in-up {
-        animation: fadeInUp 0.6s ease-out;
-      }
-
-      @media (max-width: 768px) {
-        .page-header {
-          flex-direction: column;
-          gap: 1rem;
-          align-items: flex-start;
-        }
-
-        .filters {
-          flex-direction: column;
-        }
-      }
-    `,
-  ],
+  styleUrls: ["./expense-table.component.css"],
 })
-export class ExpensetableComponent {
+export class ExpensetableComponent implements OnInit {
   expenses: Expense[] = [];
   filteredExpenses: Expense[] = [];
+  availableCategories: any[] = []; // Adjust type if you have a Category model
+  loading = false;
+  errorMessage = '';
+  showAddExpenseModal = false;
+  
   filters = {
     startDate: '',
     endDate: '',
     category: '',
     minAmount: 0,
-    maxAmount: 1000,
+    maxAmount: 1000000, // Set a high default max amount
   };
-  currentSort = { column: 'date' as keyof Expense, direction: 'desc' };
+  
+  currentSort = { column: 'createdAt' as keyof Expense, direction: 'desc' as 'asc' | 'desc' };
 
-  //constructor(private expenseService: ExpenseService) {
-    //this.expenses = this.expenseService.getExpenses();
-    //this.filteredExpenses = [...this.expenses];
-  //}
+  constructor(
+    private expenseService: ExpenseService,
+    private authService: AuthService // For auth headers if needed
+    , private CategoryService: CategoryService // Adjust path as needed
+  ) {}
+
+  ngOnInit() {
+    this.loadExpenses();
+    this.loadCategories(); // Load categories for filter dropdown
+  }
 
   ngAfterViewInit() {
-    (window as any).lucide.createIcons();
+    // Initialize Lucide icons if available
+    if ((window as any).lucide) {
+      (window as any).lucide.createIcons();
+    }
+  }
+
+ // Inside budget-table.component.ts
+loadExpenses() {
+  this.loading = true;
+  this.errorMessage = '';
+  
+  this.expenses = []; 
+  this.filteredExpenses = [];
+
+ this.expenseService.getCurrentUserExpenses().subscribe({
+  next: (expenses: Expense[] | null) => {
+    this.loading = false;
+
+    // ✅ Fallback if backend sends null
+    this.expenses = expenses ?? [];
+    this.filteredExpenses = [...this.expenses];
+    console.log('Raw expenses from API:', this.expenses);
+    console.log('Filters:', this.filters);
+
+    this.applyFilters();
+    this.sortTable(this.currentSort.column);
+
+    // Re-init icons
+    setTimeout(() => {
+      (window as any).lucide?.createIcons();
+    }, 100);
+  },
+  error: (error) => {
+    this.loading = false;
+    this.errorMessage = 'Error while loading expenses. Please try again later.';
+    this.expenses = [];
+    this.filteredExpenses = [];
+  }
+});
+
+}
+
+  loadCategories() {
+     this.CategoryService.getAllForCurrentUser().subscribe({
+       next: (categories) => {
+         this.availableCategories = categories;
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+        // Handle category loading error if needed
+       }
+    });
+    
+    
+  }
+
+  retryLoadExpenses() {
+    this.loadExpenses();
+  }
+
+  trackByExpenseId(index: number, expense: Expense): number {
+    return expense.expenseId!; // Use non-null assertion if ID is guaranteed
+  }
+
+  getCategoryName(categoryId: number): string {
+    const category = this.availableCategories.find(c => c.id === categoryId);
+    return category ? category.name : 'Inconnu';
   }
 
   sortTable(column: keyof Expense) {
@@ -279,33 +220,47 @@ export class ExpensetableComponent {
     }
 
     this.filteredExpenses.sort((a, b) => {
-      let valueA = a[column];
-      let valueB = b[column];
+      let valueA: any = a[column];
+      let valueB: any = b[column];
 
-      if (column === 'amount') {
-        valueA = parseFloat(valueA as any);
-        valueB = parseFloat(valueB as any);
+      // Handle date sorting
+      if (column === 'createdAt') {
+        valueA = valueA ? new Date(valueA).getTime() : 0;
+        valueB = valueB ? new Date(valueB).getTime() : 0;
       }
 
-      return this.currentSort.direction === 'asc'
-        ? valueA > valueB ? 1 : -1
-        : valueA < valueB ? 1 : -1;
+      // Handle numeric sorting
+      if (column === 'amount' || column === 'categoryId') {
+        valueA = parseFloat(valueA);
+        valueB = parseFloat(valueB);
+      }
+
+      if (valueA < valueB) {
+        return this.currentSort.direction === 'asc' ? -1 : 1;
+      } else if (valueA > valueB) {
+        return this.currentSort.direction === 'asc' ? 1 : -1;
+      } else {
+        return 0;
+      }
     });
   }
 
   applyFilters() {
-    this.filteredExpenses = this.expenses.filter(expense => {
+      this.filteredExpenses = this.expenses.filter(expense => {
       let passes = true;
+      const expenseDate = new Date(expense.createdAt);
+      const startDate = this.filters.startDate ? new Date(this.filters.startDate) : null;
+      const endDate = this.filters.endDate ? new Date(this.filters.endDate) : null;
 
-      if (this.filters.startDate && expense.date < this.filters.startDate) {
+      if (startDate && expenseDate < startDate) return false;
+      if (endDate && expenseDate > endDate) return false;
+
+      // Category filter
+      if (this.filters.category && expense.categoryId !== parseInt(this.filters.category)) {
         passes = false;
       }
-      if (this.filters.endDate && expense.date > this.filters.endDate) {
-        passes = false;
-      }
-      if (this.filters.category && expense.category !== this.filters.category) {
-        passes = false;
-      }
+
+      // Amount filters
       if (this.filters.minAmount && expense.amount < this.filters.minAmount) {
         passes = false;
       }
@@ -315,13 +270,75 @@ export class ExpensetableComponent {
 
       return passes;
     });
+
+    // Re-apply sorting after filtering
+    this.sortTable(this.currentSort.column);
   }
 
   openAddExpenseModal() {
-    alert("Ouverture du modal d'ajout de dépense");
+    console.log("Opening Add Expense Modal");
+    this.showAddExpenseModal = true; // Set flag to true to show modal
   }
 
-  editExpense(id: number) {
-    alert(`Édition de la dépense ${id}`);
+  closeAddExpenseModal() {
+    console.log("Closing Add Expense Modal");
+    this.showAddExpenseModal = false; // Set flag to false to hide modal
+    // Optionally clear any temporary messages in the modal
+    // This is handled by the modal's closeModal method
   }
+
+  onSaveNewExpense(expenseData: CreateExpenseRequest) {
+    console.log("Saving new expense from modal:", expenseData);
+    // This method is called when the user clicks "Ajouter la Dépense" in the modal
+    // and the modal emits the validated data.
+
+    this.loading = true; // Show loading indicator
+    this.errorMessage = ''; // Clear previous errors
+
+    // Call your ExpenseService to create the expense
+    // Adjust the service method call based on your actual ExpenseService implementation
+    // Assuming your ExpenseService has a create method that takes CreateExpenseData
+    this.expenseService.create(expenseData).subscribe({
+      next: (newExpense: Expense) => {
+        this.loading = false;
+        console.log("Expense created successfully:", newExpense);
+        // Add the new expense to the local list
+        this.expenses.push(newExpense);
+        this.filteredExpenses = [...this.expenses]; // Update filtered list
+        this.applyFilters(); // Re-apply filters/sorting
+        // Close the modal
+        this.closeAddExpenseModal();
+        // Show success message if desired (could be handled in modal too)
+        // this.successMessage = 'Dépense ajoutée avec succès !';
+      },
+      error: (error) => {
+        this.loading = false;
+        console.error("Error creating expense:", error);
+        // Handle error, show message in the main component or let modal handle it
+        this.errorMessage = error.message || 'Erreur lors de la création de la dépense.';
+        // Keep the modal open so the user can correct errors
+      }
+    });
+  }
+
+  deleteExpense(id: number) {
+    console.log('🗑️ Attempting to delete expense with ID:', id);
+
+  if (confirm('Êtes-vous sûr de vouloir supprimer cette dépense ?')) {
+    this.loading = true;
+    this.expenseService.delete(id.toString()).subscribe({
+      next: () => {
+        this.loading = false;
+        console.log(`Dépense ${id} supprimée avec succès`);
+        this.loadExpenses();
+      },
+      error: (error) => {
+        this.loading = false;
+        console.error(`Error deleting expense ${id}:`, error);
+        this.errorMessage = 'Erreur lors de la suppression de la dépense.';
+      }
+    });
+  }
+}
+
 }

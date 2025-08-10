@@ -1,6 +1,5 @@
-// models/budget.model.ts
 export interface Budget {
-id: number;
+budgetId: number;
   monthlyLimit: number;
   spent: number;
   createdAt: string;
@@ -19,7 +18,7 @@ export interface BudgetConfig {
 
 export interface CreateBudgetRequest {
   user_id?: string;
-  category_id: number;
+  categoryId: number;
   monthlyLimit: number;
 }
 

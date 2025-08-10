@@ -78,8 +78,8 @@
     <div class="card-content">
       <div>
         <h4>BUDGET USED</h4>
-        <h2>{{monthlyExpenses/currentBalance*100}}%</h2>
-        <mat-progress-bar mode="determinate" value="{{(monthlyExpenses/currentBalance*100).toFixed()}}"></mat-progress-bar>
+        <h2>{{(monthlyExpenses/currentBalance) | percent:'1.1-1'}}</h2>
+        <mat-progress-bar mode="determinate" [value]="(monthlyExpenses / currentBalance * 100)"></mat-progress-bar>
         <p class="change up" style="margin-top: 8px;">On track</p>
       </div>
       <div class="icon-circle orange">

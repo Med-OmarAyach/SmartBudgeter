@@ -1,0 +1,40 @@
+<div class="user-info-container">
+  <div class="user-card">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="avatar">
+        <span>{{ user?.displayName?.charAt(0) }}</span>
+      </div>
+      <h1>{{ user?.displayName }}</h1>
+      <p class="user-email">{{ user?.email }}</p>
+    </div>
+
+    <!-- Divider -->
+    <hr class="divider">
+
+    <!-- Info Section -->
+    <div class="info-section">
+      <div class="user-field">
+        <span class="label"><i class="fas fa-users"></i> Family Name:</span>
+        <span class="value">{{ user?.familyName }}</span>
+      </div>
+      <div class="user-field">
+        <span class="label"><i class="fas fa-user-friends"></i> Family Members:</span>
+        <span class="value">{{ user?.familyMembers }}</span>
+      </div>
+      <div class="user-field">
+        <span class="label"><i class="fas fa-wallet"></i> Balance:</span>
+        <span class="value">{{ user?.balance | currency:'EUR' }}</span>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <hr class="divider">
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn btn-black" (click)="editUser()">Edit Info</button>
+      <button class="btn btn-outline" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</div>

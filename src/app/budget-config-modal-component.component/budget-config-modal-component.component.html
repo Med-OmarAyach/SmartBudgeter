@@ -1,7 +1,7 @@
 <div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2>Configuration du Budget</h2>
+          <h2>Budget Settings</h2>
           <button class="close-btn" (click)="closeModal()" type="button">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -26,7 +26,7 @@
        
         <!-- Current Budget Categories -->
         <div class="form-section" *ngIf="budgetConfigs.length > 0">
-          <h3>Limites Actuelles</h3>
+          <h3>Current Limits</h3>
           <div class="budget-list">
             <div class="budget-item" *ngFor="let config of budgetConfigs; trackBy: trackByCategory">
               <div class="budget-info">
@@ -43,17 +43,17 @@
         </div>
 
         <div class="form-section">
-          <h3>Ajouter une Limite Mensuelle</h3>
+          <h3>Add Monthly Limit</h3>
          
           <div class="add-category-section">
             <div class="form-group">
-              <label>Choisir ou créer une catégorie</label>
+              <label>Select or create a category</label>
               <select
                 [(ngModel)]="selectedCategoryId"
                 name="newCategory"
                 class="form-control"
                 (ngModelChange)="onCategoryChange()">
-                <option value="">Sélectionner une catégorie</option>
+                <option value="">Select a category</option>
                 <option *ngFor="let category of availableCategories" [value]="category.id">
                   {{ category.name }}
                 </option>
@@ -61,17 +61,17 @@
             </div>
             
             <div class="form-group" *ngIf="!selectedCategoryId">
-              <label>Ou créer une nouvelle catégorie</label>
+              <label>Or create a new category</label>
               <input
                 type="text"
                 [(ngModel)]="customCategoryName"
                 name="customCategoryName"
                 class="form-control"
-                placeholder="Nom de la nouvelle catégorie">
+                placeholder="New category name">
             </div>
            
             <div class="form-group" *ngIf="selectedCategoryId || customCategoryName">
-              <label>Limite mensuelle</label>
+              <label>Monthly limit</label>
               <div class="input-group">
                 <input
                   type="number"
@@ -93,7 +93,7 @@
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              Ajouter Budget
+              Add Budget
             </button>
             
             <div *ngIf="availableCategories.length === 0 && !customCategoryName" class="no-categories-message">
@@ -102,16 +102,16 @@
                   <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
                   <path d="M12 16v-4m0-4h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                Aucune catégorie disponible. Créez une nouvelle catégorie ci-dessus.
+                No categories available. Create a new category above.
               </p>
             </div>
           </div>
         </div>
        
         <div class="alert-section">
-          <h3>Paramètres d'Alerte</h3>           
+          <h3>Alert Settings</h3>           
           <div class="form-group">
-            <label>Seuil d'alerte ({{ alertSettings.warningThreshold }}%)</label>
+            <label>Alert threshold ({{ alertSettings.warningThreshold }}%)</label>
             <div class="input-group range-group">
               <input
                 type="range"
@@ -127,8 +127,8 @@
         </div>
        
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline" (click)="closeModal()">
-            Fermer
+          <button (click)="closeModal()" class="btn btn-outline" type="button">
+            Close
           </button>
         </div>
       </div>

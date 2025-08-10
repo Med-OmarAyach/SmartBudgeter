@@ -1,10 +1,17 @@
 // register.component.ts
-import { Component } from '@angular/core';
+import { Component ,OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule,HttpHeaders } from '@angular/common/http';
 import { GoogleSigninService } from '../services/google-singin.service';
-
+import { AuthService,  } from '../services/auth.service';
+import { Router } from '@angular/router'; // Import Router
+interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  userId: number; 
+  displayName: string;
+}
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -19,18 +26,18 @@ import { GoogleSigninService } from '../services/google-singin.service';
         
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
           <div class="form-group">
-            <label for="username">Username</label>
+            <label for="displayName">displayName</label>
             <input
               type="text"
-              id="username"
-              formControlName="username"
-              placeholder="Choose a username"
-              [class.error]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+              id="displayName"
+              formControlName="displayName"
+              placeholder="Choose a displayName"
+              [class.error]="registerForm.get('displayName')?.invalid && registerForm.get('displayName')?.touched"
             />
-            <div *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched" class="error-message">
-              <span *ngIf="registerForm.get('username')?.errors?.['required']">Username is required</span>
-              <span *ngIf="registerForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</span>
-              <span *ngIf="registerForm.get('username')?.errors?.['maxlength']">Username must not exceed 20 characters</span>
+            <div *ngIf="registerForm.get('displayName')?.invalid && registerForm.get('displayName')?.touched" class="error-message">
+              <span *ngIf="registerForm.get('displayName')?.errors?.['required']">displayName is required</span>
+              <span *ngIf="registerForm.get('displayName')?.errors?.['minlength']">displayName must be at least 3 characters</span>
+              <span *ngIf="registerForm.get('displayName')?.errors?.['maxlength']">displayName must not exceed 20 characters</span>
             </div>
           </div>
 
@@ -133,12 +140,11 @@ import { GoogleSigninService } from '../services/google-singin.service';
         </div>
 
     
-<!-- In your component HTML -->
  <div class="gclass"><div id="google-button"></div></div>
 
 
         <div class="login-link">
-          Already have an account? <a href="/login" class="link">Sign in</a>
+          Already have an account? <a href="/#/login" class="link">Sign in</a>
         </div>
       </div>
     </div>
@@ -148,7 +154,7 @@ import { GoogleSigninService } from '../services/google-singin.service';
       position: absolute;
       top: 0;
       min-height: 120vh;
-      min-width:120vw;
+      width:100%;
       background: #121621;
       display: flex;
       align-items: center;
@@ -166,6 +172,7 @@ import { GoogleSigninService } from '../services/google-singin.service';
       width: 100%;
       max-width: 450px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    
     }
 
     .register-header {
@@ -415,15 +422,21 @@ justify-content: center
     }
   `]
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit { // Implement OnInit
   registerForm: FormGroup;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+  private apiUrl = 'http://localhost:8083/api/auth';
 
-  private apiUrl = 'http://localhost:8083/api/auth'; // Adjust to your API URL
-
-  constructor(private fb: FormBuilder, private http: HttpClient, private googleSignin: GoogleSigninService) {
+  // 1. Inject AuthService and Router
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private googleSignin: GoogleSigninService,
+    private authService: AuthService, // <-- Inject AuthService
+    private router: Router // <-- Inject Router (optional, for navigation)
+  ) {
     this.registerForm = this.fb.group({
       username: ['', [
         Validators.required,
@@ -441,59 +454,73 @@ export class RegisterComponent {
     });
   }
 
-  passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
-    return null; // Removed since we don't have confirmPassword field
+  ngOnInit(): void {
+    this.googleSignin.initialize();
   }
-
-  // Removed password strength methods since we're using simpler validation
 
   onSubmit() {
     this.errorMessage = '';
     this.successMessage = '';
-
     if (this.registerForm.valid) {
       this.isLoading = true;
-      
+      // Ensure the key matches your backend DTO (displayName)
       const registerData = {
-        username: this.registerForm.value.username,
+        displayName: this.registerForm.value.username, // <-- Changed key to displayName
         email: this.registerForm.value.email,
         password: this.registerForm.value.password,
         familyName: this.registerForm.value.familyName || null,
         familyMember: this.registerForm.value.familyMember || null
       };
 
-      this.http.post(`${this.apiUrl}/register`, registerData, { responseType: 'text' })
+      // 2. Update the HTTP call to expect JSON response (AuthResponse)
+      this.http.post<AuthResponse>(`${this.apiUrl}/register`, registerData) // <-- Specify <AuthResponse> type
         .subscribe({
-          next: (response) => {
+          next: (response: AuthResponse) => { // <-- Type the response
             this.isLoading = false;
-            this.successMessage = response;
+            // Handle the response object
+            // Option 1: Show a generic success message
+            this.successMessage = 'Registration successful! You are now logged in.';
+            // Option 2: Use a message potentially sent from backend if included in AuthResponse
+            // this.successMessage = response.message || 'Registration successful!';
+            console.log('Registration successful, received response:', response);
+
+            // 3. Crucially, store the authentication data (tokens AND userId)
+            this.authService.storeAuthData(response); // <-- Call storeAuthData
+
+            // Reset the form
             this.registerForm.reset();
-            // Optionally redirect to login page after successful registration
-            // this.router.navigate(['/login']);
+
+            // 4. Optional: Navigate to a protected route (like dashboard)
+            // Use a short delay so the success message is visible, or navigate immediately
+            // setTimeout(() => {
+              this.router.navigate(['/dashboard']); // <-- Adjust route as needed
+            // }, 2000); // Navigate after 2 seconds
+
           },
           error: (error) => {
             this.isLoading = false;
+            console.error('Registration error:', error); // Log the full error for debugging
             if (error.status === 409) {
-              this.errorMessage = error.error;
+              // Use error.error if backend sends a specific string message
+              // Use error.message for generic client-side errors
+              this.errorMessage = error.error || 'Conflict - User might already exist.';
+            } else if (error.status >= 400 && error.status < 500) {
+                 this.errorMessage = `Registration failed (Status: ${error.status}). Please check your input.`;
             } else {
-              this.errorMessage = 'Registration failed. Please try again.';
+              this.errorMessage = 'Registration failed. Please try again later.';
             }
           }
         });
     } else {
-      // Mark all fields as touched to show validation errors
       Object.keys(this.registerForm.controls).forEach(key => {
         this.registerForm.get(key)?.markAsTouched();
       });
     }
   }
 
+  // signUpWithGoogle method remains the same or needs separate implementation
   signUpWithGoogle() {
     console.log('Google sign-up clicked');
-    // Implement Google OAuth here
+    // Implement Google OAuth here or use GoogleSigninService
   }
-
- ngOnInit(): void {
-  this.googleSignin.initialize();
-}
 }

@@ -1,4 +1,4 @@
-<!-- Floating Bubble -->
+<!-- Floating Chat Button -->
 <button
   *ngIf="!open"
   mat-fab
@@ -11,22 +11,26 @@
 
 <!-- Chat Box -->
 <mat-card *ngIf="open" class="chat-box">
-  <mat-card-header>
+  <mat-card-header class="chat-header">
     <mat-card-title>SmartBudgeter Chatbot</mat-card-title>
     <button mat-icon-button (click)="open = false">
       <mat-icon>close</mat-icon>
     </button>
   </mat-card-header>
+
   <mat-divider></mat-divider>
 
   <mat-card-content class="chat-content">
-  <div *ngFor="let msg of messages" [ngClass]="msg.sender === 'user' ? 'user-msg' : 'bot-msg'">
-    <div class="chat-bubble" [ngClass]="msg.sender">
-      {{ msg.text }}
+    <div
+      *ngFor="let msg of messages"
+      [ngClass]="msg.sender === 'user' ? 'user-msg' : 'bot-msg'"
+    >
+      <div class="chat-bubble" [ngClass]="msg.sender">
+        {{ msg.text }}
+      </div>
     </div>
-  </div>
-  <div #messagesEnd></div>
-</mat-card-content>
+    <div #messagesEnd></div>
+  </mat-card-content>
 
   <div class="chat-input">
     <mat-form-field class="input-field" appearance="outline">
@@ -37,7 +41,12 @@
         (keydown.enter)="handleSend()"
       />
     </mat-form-field>
-    <button mat-icon-button color="primary" (click)="handleSend()">
+    <button
+      mat-icon-button
+      color="primary"
+      (click)="handleSend()"
+      [disabled]="!input.trim()"
+    >
       <mat-icon>send</mat-icon>
     </button>
   </div>

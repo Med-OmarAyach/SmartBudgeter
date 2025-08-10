@@ -118,7 +118,7 @@ export class DashboardComponent implements OnInit {
   // REPLACE your current loadChartData() with this:
 loadChartData(): void {
   const currentUserId = 1; // Get from your auth service
-  this.balanceService.getCategorySummaryForUser(currentUserId).subscribe({
+  this.balanceService.getCategorySummaryForUser().subscribe({
     next: (data) => {
       console.log('Raw API data:', data);
       
@@ -173,7 +173,7 @@ refreshChart(): void {
     const userId = 1; // Replace with actual user ID
     
     // Load balance
-    this.balanceService.getBalance(userId).subscribe({
+    this.balanceService.getBalance().subscribe({
       next: (balance: number) => {
         this.currentBalance = balance;
         this.newBalanceInput = balance;
@@ -187,7 +187,7 @@ refreshChart(): void {
     });
 
     // Load monthly expenses
-    this.balanceService.getMonthlyExpenses(userId).subscribe({
+    this.balanceService.getMonthlyExpenses().subscribe({
       next: (expenses: number) => {
         this.monthlyExpenses = expenses;
         this.expensesLoading = false;
@@ -211,7 +211,7 @@ refreshChart(): void {
   updateBalance() {
     const userId = 1;
     
-    this.balanceService.updateBalance(userId, this.newBalanceInput).subscribe({
+    this.balanceService.updateBalance(this.newBalanceInput).subscribe({
       next: (user: any) => {
         this.currentBalance = this.newBalanceInput;
         this.isEditingBalance = false;

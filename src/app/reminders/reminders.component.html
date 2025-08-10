@@ -1,0 +1,30 @@
+<div class="reminders-page">
+  <h1 class="page-title">📅 My Reminders</h1>
+
+  <!-- Add Reminder Form -->
+  <div class="reminder-form">
+    <input type="text" placeholder="Title" [(ngModel)]="newReminder.title">
+    <input type="date" [(ngModel)]="newReminder.dueDate">
+    <textarea placeholder="Message" [(ngModel)]="newReminder.message"></textarea>
+    <button class="btn-add" (click)="addReminder()">➕ Add</button>
+  </div>
+
+  <!-- Reminders List -->
+  <div class="reminder-list" *ngIf="reminders.length > 0; else noReminders">
+    <div class="reminder-card" *ngFor="let r of reminders">
+      <div class="reminder-header">
+        <h2>{{ r.title }}</h2>
+        <span class="due-date">📆 {{ r.dueDate }}</span>
+      </div>
+      <p class="reminder-message">{{ r.message }}</p>
+      <div class="reminder-actions">
+        <button class="btn-delete" (click)="deleteReminder(r.reminderId)">🗑 Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Reminders -->
+  <ng-template #noReminders>
+    <p class="no-reminders">No reminders yet. Add one above!</p>
+  </ng-template>
+</div>
